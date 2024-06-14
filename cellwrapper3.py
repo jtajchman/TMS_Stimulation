@@ -46,7 +46,6 @@ def loadCell_Net(cellName, cellTemplateName):
     
     print (cell)
     os.chdir(origDir)
-    exit()
     return cell
 
 def loadTemplateName_tmsneurosim(cellFolder):     
@@ -82,22 +81,6 @@ def loadCell_Net_adv(cellName, id):
 
     #print(hcell)
     return cell
-def loadCell_L5_TTPC2_cADpyr(cellNumber):
-
-    from cellwrapperTMSlike import L5_TTPC2_cADpyr
-
-    # from neuron import h 
-
-    # h.load_file("stdrun.hoc")
-
-    cell = L5_TTPC2_cADpyr(cellNumber)
-    print(cell.loaded)
-
-    cell.load()
-    print(cell.loaded)
-    
-    return cell
-
 
 # from neuron import h
 # import os
