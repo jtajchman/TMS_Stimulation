@@ -2,7 +2,9 @@ import math
 
 import numpy as np
 
-from tmsneurosim.nrn.simulation.threshold_factor_simulation import ThresholdFactorSimulation
+from tmsneurosim.nrn.simulation.threshold_factor_simulation import (
+    ThresholdFactorSimulation,
+)
 
 
 class ThresholdUniformGradientSimulation(ThresholdFactorSimulation):
@@ -11,8 +13,14 @@ class ThresholdUniformGradientSimulation(ThresholdFactorSimulation):
     segment.
     """
 
-    def apply_e_field(self, e_field_theta, e_field_phi, relative_gradient_per_mm, phi_gradient_per_mm,
-                      theta_gradient_per_mm):
+    def apply_e_field(
+        self,
+        e_field_theta,
+        e_field_phi,
+        relative_gradient_per_mm,
+        phi_gradient_per_mm,
+        theta_gradient_per_mm,
+    ):
         """
         Applies an artificial parameter based E-field at each segment by calculating the quasi potentials from it.
         :param e_field_theta: The polar angle of the E-field in relation to the somatodentritic axes of the neuron.
@@ -32,8 +40,12 @@ class ThresholdUniformGradientSimulation(ThresholdFactorSimulation):
         soma_distance_to_min = math.fabs(soma_position_z - min_z)
         soma_distance_to_max = math.fabs(soma_position_z - max_z)
 
-        magnitude_at_max = 1 + soma_distance_to_max / 1000 * ((-relative_gradient_per_mm) / 100)
-        magnitude_at_min = 1 + soma_distance_to_min / 1000 * (relative_gradient_per_mm / 100)
+        magnitude_at_max = 1 + soma_distance_to_max / 1000 * (
+            (-relative_gradient_per_mm) / 100
+        )
+        magnitude_at_min = 1 + soma_distance_to_min / 1000 * (
+            relative_gradient_per_mm / 100
+        )
 
         phi_at_max = soma_distance_to_max / 1000 * phi_gradient_per_mm
         phi_at_min = soma_distance_to_min / 1000 * (-phi_gradient_per_mm)
@@ -44,21 +56,35 @@ class ThresholdUniformGradientSimulation(ThresholdFactorSimulation):
         i = 0
         for section in self.neuron_cell.all:
             for segment in section:
-                gradient_phi = np.interp(cell_segment_coordinates[i][2],
-                                         [min_z, soma_position_z, max_z],
-                                         [phi_at_min, 0, phi_at_max])
+                gradient_phi = np.interp(
+                    cell_segment_coordinates[i][2],
+                    [min_z, soma_position_z, max_z],
+                    [phi_at_min, 0, phi_at_max],
+                )
                 phi = math.radians(e_field_phi + gradient_phi)
 
-                gradient_theta = np.interp(cell_segment_coordinates[i][2],
-                                           [min_z, soma_position_z, max_z],
-                                           [theta_at_min, 0, theta_at_max])
+                gradient_theta = np.interp(
+                    cell_segment_coordinates[i][2],
+                    [min_z, soma_position_z, max_z],
+                    [theta_at_min, 0, theta_at_max],
+                )
                 theta = math.radians(e_field_theta + gradient_theta)
                 e_field_direction = np.array(
-                    [math.sin(theta) * math.cos(phi), math.sin(theta) * math.sin(phi), math.cos(theta)])
+                    [
+                        math.sin(theta) * math.cos(phi),
+                        math.sin(theta) * math.sin(phi),
+                        math.cos(theta),
+                    ]
+                )
 
-                gradient_magnitude = max(np.interp(cell_segment_coordinates[i][2],
-                                                   [min_z, soma_position_z, max_z],
-                                                   [magnitude_at_min, 1, magnitude_at_max]), 0)
+                gradient_magnitude = max(
+                    np.interp(
+                        cell_segment_coordinates[i][2],
+                        [min_z, soma_position_z, max_z],
+                        [magnitude_at_min, 1, magnitude_at_max],
+                    ),
+                    0,
+                )
 
                 e_field_at_segment = e_field_direction * gradient_magnitude
                 segment.Ex_xtra = e_field_at_segment[0]
@@ -77,12 +103,14 @@ class ThresholdUniformGradientSimulation(ThresholdFactorSimulation):
             parent_segment = parent_stack.pop()
 
             for segment in segments:
-                segment.es_xtra = parent_segment.es_xtra - 0.5 * 1e-3 * \
-                                  ((parent_segment.Ex_xtra + segment.Ex_xtra) * (segment.x_xtra - parent_segment.x_xtra)
-                                   + (parent_segment.Ey_xtra + segment.Ey_xtra) * (
-                                           segment.y_xtra - parent_segment.y_xtra)
-                                   + (parent_segment.Ez_xtra + segment.Ez_xtra) * (
-                                           segment.z_xtra - parent_segment.z_xtra))
+                segment.es_xtra = parent_segment.es_xtra - 0.5 * 1e-3 * (
+                    (parent_segment.Ex_xtra + segment.Ex_xtra)
+                    * (segment.x_xtra - parent_segment.x_xtra)
+                    + (parent_segment.Ey_xtra + segment.Ey_xtra)
+                    * (segment.y_xtra - parent_segment.y_xtra)
+                    + (parent_segment.Ez_xtra + segment.Ez_xtra)
+                    * (segment.z_xtra - parent_segment.z_xtra)
+                )
                 parent_segment = segment
 
             children = list(current_section.children())

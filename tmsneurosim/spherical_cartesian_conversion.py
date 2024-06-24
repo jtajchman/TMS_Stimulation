@@ -11,7 +11,7 @@ def cartesian_to_spherical(x, y, z):
     :param z: The z coordinate
     :return: The azimuthal angle, the polar angle and the length.
     """
-    r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+    r = np.sqrt(x**2 + y**2 + z**2)
     phi, theta = norm_cartesian_to_spherical(x / r, y / r, z / r)
     return phi, theta, r
 
@@ -30,12 +30,12 @@ def spherical_to_cartesian(phi, theta, r):
 
 def norm_cartesian_to_spherical(x, y, z):
     """
-        Calculates normalized spherical coordinates from cartesian coordinates.
-        :param x: The x coordinate
-        :param y: The y coordinate
-        :param z: The z coordinate
-        :return: The azimuthal angle, the polar angle and the length.
-        """
+    Calculates normalized spherical coordinates from cartesian coordinates.
+    :param x: The x coordinate
+    :param y: The y coordinate
+    :param z: The z coordinate
+    :return: The azimuthal angle, the polar angle and the length.
+    """
     if x > 0 and y > 0:
         phi = np.arctan(np.fabs(y / x))
     elif x > 0 and y < 0:
@@ -65,4 +65,8 @@ def norm_spherical_to_cartesian(phi, theta):
     """
     theta = math.radians(theta)
     phi = math.radians(phi)
-    return math.sin(theta) * math.cos(phi), math.sin(theta) * math.sin(phi), math.cos(theta)
+    return (
+        math.sin(theta) * math.cos(phi),
+        math.sin(theta) * math.sin(phi),
+        math.cos(theta),
+    )

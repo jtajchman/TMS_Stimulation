@@ -60,7 +60,7 @@ def create_cell():
 def create_stimuli(cell, stim_start, stim_end, current_amplitude):
     """Create the stimuli"""
 
-    print('Attaching stimulus electrodes')
+    print("Attaching stimulus electrodes")
 
     stimuli = []
 
@@ -68,9 +68,11 @@ def create_stimuli(cell, stim_start, stim_end, current_amplitude):
     iclamp.delay = stim_start
     iclamp.dur = stim_end - stim_start
     iclamp.amp = current_amplitude
-    print('Setting up step current clamp: '
-          'amp=%f nA, delay=%f ms, duration=%f ms' %
-          (iclamp.amp, iclamp.delay, iclamp.dur))
+    print(
+        "Setting up step current clamp: "
+        "amp=%f nA, delay=%f ms, duration=%f ms"
+        % (iclamp.amp, iclamp.delay, iclamp.dur)
+    )
 
     stimuli.append(iclamp)
 
@@ -79,25 +81,21 @@ def create_stimuli(cell, stim_start, stim_end, current_amplitude):
 
 def create_recordings(cell):
     """Create the recordings"""
-    print('Attaching recording electrodes')
+    print("Attaching recording electrodes")
 
     recordings = {}
 
-    recordings['time'] = neuron.h.Vector()
-    recordings['soma(0.5)'] = neuron.h.Vector()
+    recordings["time"] = neuron.h.Vector()
+    recordings["soma(0.5)"] = neuron.h.Vector()
 
-    recordings['time'].record(neuron.h._ref_t, 0.1)
-    recordings['soma(0.5)'].record(cell.soma[0](0.5)._ref_v, 0.1)
+    recordings["time"].record(neuron.h._ref_t, 0.1)
+    recordings["soma(0.5)"].record(cell.soma[0](0.5)._ref_v, 0.1)
 
     return recordings
 
 
-def run_RmpRiTau_step(
-        stim_start,
-        stim_end,
-        current_amplitude,
-        plot_traces=None):
-    """Run """
+def run_RmpRiTau_step(stim_start, stim_end, current_amplitude, plot_traces=None):
+    """Run"""
 
     cell = create_cell()
     stimuli = create_stimuli(cell, stim_start, stim_end, current_amplitude)  # noqa
@@ -105,11 +103,9 @@ def run_RmpRiTau_step(
 
     # Overriding default 30s simulation,
     neuron.h.tstop = stim_end + stim_start
-    print(
-        'Setting simulation time to %.6g ms for the step current' %
-        neuron.h.tstop)
+    print("Setting simulation time to %.6g ms for the step current" % neuron.h.tstop)
 
-    print('Setting initial voltage to -70 mV')
+    print("Setting initial voltage to -70 mV")
     neuron.h.v_init = -70
 
     neuron.h.stdinit()
@@ -124,26 +120,26 @@ def run_RmpRiTau_step(
 
     neuron.h.continuerun(3000)
 
-    time = numpy.array(recordings['time'])
-    soma_voltage = numpy.array(recordings['soma(0.5)'])
+    time = numpy.array(recordings["time"])
+    soma_voltage = numpy.array(recordings["soma(0.5)"])
 
-    recordings_dir = 'python_recordings'
+    recordings_dir = "python_recordings"
 
     soma_voltage_filename = os.path.join(
-        recordings_dir,
-        'soma_voltage_RmpRiTau_step.dat')
+        recordings_dir, "soma_voltage_RmpRiTau_step.dat"
+    )
     numpy.savetxt(soma_voltage_filename, zip(time, soma_voltage))
 
-    print('Soma voltage for RmpRiTau trace saved to: %s'
-          % (soma_voltage_filename))
+    print("Soma voltage for RmpRiTau trace saved to: %s" % (soma_voltage_filename))
 
     if plot_traces:
         import pylab
-        pylab.figure(facecolor='white')
-        pylab.plot(recordings['time'], recordings['soma(0.5)'])
-        pylab.xlabel('time (ms)')
-        pylab.ylabel('Vm (mV)')
-        pylab.gcf().canvas.set_window_title('RmpRiTau trace')
+
+        pylab.figure(facecolor="white")
+        pylab.plot(recordings["time"], recordings["soma(0.5)"])
+        pylab.xlabel("time (ms)")
+        pylab.ylabel("Vm (mV)")
+        pylab.gcf().canvas.set_window_title("RmpRiTau trace")
 
     return time, soma_voltage, stim_start, stim_end
 
@@ -154,16 +150,11 @@ def init_simulation():
     neuron.h.load_file("stdrun.hoc")
     neuron.h.load_file("import3d.hoc")
 
-    print('Loading constants')
-    neuron.h.load_file('constants.hoc')
+    print("Loading constants")
+    neuron.h.load_file("constants.hoc")
 
 
-def analyse_RmpRiTau_trace(
-        time,
-        soma_voltage,
-        stim_start,
-        stim_end,
-        current_amplitude):
+def analyse_RmpRiTau_trace(time, soma_voltage, stim_start, stim_end, current_amplitude):
     """Analyse the output of the RmpRiTau protocol"""
 
     # Import the eFeature Extraction Library
@@ -171,47 +162,56 @@ def analyse_RmpRiTau_trace(
 
     # Prepare the trace data
     trace = {}
-    trace['T'] = time
-    trace['V'] = soma_voltage
-    trace['stim_start'] = [stim_start]
-    trace['stim_end'] = [stim_end]
+    trace["T"] = time
+    trace["V"] = soma_voltage
+    trace["stim_start"] = [stim_start]
+    trace["stim_end"] = [stim_end]
 
     # Calculate the necessary eFeatures
     efel_results = efel.getFeatureValues(
         [trace],
-        ['voltage_base', 'steady_state_voltage_stimend',
-         'decay_time_constant_after_stim'])
+        [
+            "voltage_base",
+            "steady_state_voltage_stimend",
+            "decay_time_constant_after_stim",
+        ],
+    )
 
-    voltage_base = efel_results[0]['voltage_base'][0]
-    ss_voltage = efel_results[0]['steady_state_voltage_stimend'][0]
-    dct = efel_results[0]['decay_time_constant_after_stim'][0]
+    voltage_base = efel_results[0]["voltage_base"][0]
+    ss_voltage = efel_results[0]["steady_state_voltage_stimend"][0]
+    dct = efel_results[0]["decay_time_constant_after_stim"][0]
 
     # Calculate input resistance
     input_resistance = float(ss_voltage - voltage_base) / current_amplitude
 
     rmpritau_dict = {}
 
-    rmpritau_dict['Rmp'] = '%.6g' % voltage_base
-    rmpritau_dict['Rmp_Units'] = 'mV'
-    rmpritau_dict['Rin'] = '%.6g' % input_resistance
-    rmpritau_dict['Rin_Units'] = 'MOhm'
-    rmpritau_dict['Tau'] = '%.6g' % dct
-    rmpritau_dict['Tau_Units'] = 'ms'
+    rmpritau_dict["Rmp"] = "%.6g" % voltage_base
+    rmpritau_dict["Rmp_Units"] = "mV"
+    rmpritau_dict["Rin"] = "%.6g" % input_resistance
+    rmpritau_dict["Rin_Units"] = "MOhm"
+    rmpritau_dict["Tau"] = "%.6g" % dct
+    rmpritau_dict["Tau_Units"] = "ms"
 
-    print('Resting membrane potential is %s %s' %
-          (rmpritau_dict['Rmp'], rmpritau_dict['Rmp_Units']))
-    print('Input resistance is %s %s' %
-          (rmpritau_dict['Rin'], rmpritau_dict['Rin_Units']))
-    print('Time constant is %s %s' %
-          (rmpritau_dict['Tau'], rmpritau_dict['Tau_Units']))
+    print(
+        "Resting membrane potential is %s %s"
+        % (rmpritau_dict["Rmp"], rmpritau_dict["Rmp_Units"])
+    )
+    print(
+        "Input resistance is %s %s" % (rmpritau_dict["Rin"], rmpritau_dict["Rin_Units"])
+    )
+    print("Time constant is %s %s" % (rmpritau_dict["Tau"], rmpritau_dict["Tau_Units"]))
 
     import json
 
-    with open('rmp_ri_tau.json', 'w') as rmpritau_json_file:
-        json.dump(rmpritau_dict, rmpritau_json_file,
-                  sort_keys=True,
-                  indent=4,
-                  separators=(',', ': '))
+    with open("rmp_ri_tau.json", "w") as rmpritau_json_file:
+        json.dump(
+            rmpritau_dict,
+            rmpritau_json_file,
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+        )
 
 
 def main(plot_traces=False):
@@ -220,7 +220,8 @@ def main(plot_traces=False):
     # Import matplotlib to plot the traces
     if plot_traces:
         import matplotlib
-        matplotlib.rcParams['path.simplify'] = False
+
+        matplotlib.rcParams["path.simplify"] = False
 
     init_simulation()
 
@@ -229,26 +230,23 @@ def main(plot_traces=False):
     stim_end = 2000
 
     time, soma_voltage, stim_start, stim_end = run_RmpRiTau_step(
-        stim_start, stim_end, current_amplitude, plot_traces=plot_traces)
+        stim_start, stim_end, current_amplitude, plot_traces=plot_traces
+    )
 
-    analyse_RmpRiTau_trace(
-        time,
-        soma_voltage,
-        stim_start,
-        stim_end,
-        current_amplitude)
+    analyse_RmpRiTau_trace(time, soma_voltage, stim_start, stim_end, current_amplitude)
 
     if plot_traces:
         import pylab
+
         pylab.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) == 1:
         main(plot_traces=True)
-    elif len(sys.argv) == 2 and sys.argv[1] == '--no-plots':
+    elif len(sys.argv) == 2 and sys.argv[1] == "--no-plots":
         main(plot_traces=False)
     else:
         raise Exception(
-            "Script only accepts one argument: --no-plots, not %s" %
-            str(sys.argv))
+            "Script only accepts one argument: --no-plots, not %s" % str(sys.argv)
+        )

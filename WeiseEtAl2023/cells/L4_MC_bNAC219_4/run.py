@@ -60,22 +60,24 @@ def create_cell(add_synapses=True):
 def create_stimuli(cell, step_number):
     """Create the stimuli"""
 
-    print('Attaching stimulus electrodes')
+    print("Attaching stimulus electrodes")
 
     stimuli = []
     step_amp = [0] * 3
 
-    with open('current_amps.dat', 'r') as current_amps_file:
-        first_line = current_amps_file.read().split('\n')[0].strip()
-        hyp_amp, step_amp[0], step_amp[1], step_amp[2] = first_line.split(' ')
+    with open("current_amps.dat", "r") as current_amps_file:
+        first_line = current_amps_file.read().split("\n")[0].strip()
+        hyp_amp, step_amp[0], step_amp[1], step_amp[2] = first_line.split(" ")
 
     iclamp = neuron.h.IClamp(0.5, sec=cell.soma[0])
     iclamp.delay = 700
     iclamp.dur = 2000
     iclamp.amp = float(step_amp[step_number - 1])
-    print('Setting up step current clamp: '
-          'amp=%f nA, delay=%f ms, duration=%f ms' %
-          (iclamp.amp, iclamp.delay, iclamp.dur))
+    print(
+        "Setting up step current clamp: "
+        "amp=%f nA, delay=%f ms, duration=%f ms"
+        % (iclamp.amp, iclamp.delay, iclamp.dur)
+    )
 
     stimuli.append(iclamp)
 
@@ -83,9 +85,11 @@ def create_stimuli(cell, step_number):
     hyp_iclamp.delay = 0
     hyp_iclamp.dur = 3000
     hyp_iclamp.amp = float(hyp_amp)
-    print('Setting up hypamp current clamp: '
-          'amp=%f nA, delay=%f ms, duration=%f ms' %
-          (hyp_iclamp.amp, hyp_iclamp.delay, hyp_iclamp.dur))
+    print(
+        "Setting up hypamp current clamp: "
+        "amp=%f nA, delay=%f ms, duration=%f ms"
+        % (hyp_iclamp.amp, hyp_iclamp.delay, hyp_iclamp.dur)
+    )
 
     stimuli.append(hyp_iclamp)
 
@@ -94,15 +98,15 @@ def create_stimuli(cell, step_number):
 
 def create_recordings(cell):
     """Create the recordings"""
-    print('Attaching recording electrodes')
+    print("Attaching recording electrodes")
 
     recordings = {}
 
-    recordings['time'] = neuron.h.Vector()
-    recordings['soma(0.5)'] = neuron.h.Vector()
+    recordings["time"] = neuron.h.Vector()
+    recordings["soma(0.5)"] = neuron.h.Vector()
 
-    recordings['time'].record(neuron.h._ref_t, 0.1)
-    recordings['soma(0.5)'].record(cell.soma[0](0.5)._ref_v, 0.1)
+    recordings["time"].record(neuron.h._ref_t, 0.1)
+    recordings["soma(0.5)"].record(cell.soma[0](0.5)._ref_v, 0.1)
 
     return recordings
 
@@ -115,37 +119,36 @@ def run_step(step_number, plot_traces=False):
     recordings = create_recordings(cell)
 
     # Overriding default 30s simulation,
-    print('Setting simulation time to 3s for the step currents')
+    print("Setting simulation time to 3s for the step currents")
     neuron.h.tstop = 3000
 
-    print('Disabling variable timestep integration')
+    print("Disabling variable timestep integration")
     neuron.h.cvode_active(0)
 
-    print('Running for %f ms' % neuron.h.tstop)
+    print("Running for %f ms" % neuron.h.tstop)
     neuron.h.run()
 
-    time = numpy.array(recordings['time'])
-    soma_voltage = numpy.array(recordings['soma(0.5)'])
+    time = numpy.array(recordings["time"])
+    soma_voltage = numpy.array(recordings["soma(0.5)"])
 
-    recordings_dir = 'python_recordings'
+    recordings_dir = "python_recordings"
 
     soma_voltage_filename = os.path.join(
-        recordings_dir,
-        'soma_voltage_step%d.dat' % step_number)
-    numpy.savetxt(
-        soma_voltage_filename,
-        numpy.column_stack((time,soma_voltage))
+        recordings_dir, "soma_voltage_step%d.dat" % step_number
     )
+    numpy.savetxt(soma_voltage_filename, numpy.column_stack((time, soma_voltage)))
 
-    print('Soma voltage for step %d saved to: %s'
-          % (step_number, soma_voltage_filename))
+    print(
+        "Soma voltage for step %d saved to: %s" % (step_number, soma_voltage_filename)
+    )
 
     if plot_traces:
         import pylab
-        pylab.figure('Step %d' % step_number)
-        pylab.plot(recordings['time'], recordings['soma(0.5)'])
-        pylab.xlabel('time (ms)')
-        pylab.ylabel('Vm (mV)')
+
+        pylab.figure("Step %d" % step_number)
+        pylab.plot(recordings["time"], recordings["soma(0.5)"])
+        pylab.xlabel("time (ms)")
+        pylab.ylabel("Vm (mV)")
 
 
 def init_simulation():
@@ -154,8 +157,8 @@ def init_simulation():
     neuron.h.load_file("stdrun.hoc")
     neuron.h.load_file("import3d.hoc")
 
-    print('Loading constants')
-    neuron.h.load_file('constants.hoc')
+    print("Loading constants")
+    neuron.h.load_file("constants.hoc")
 
 
 def main(plot_traces=True):
@@ -164,7 +167,8 @@ def main(plot_traces=True):
     # Import matplotlib to plot the traces
     if plot_traces:
         import matplotlib
-        matplotlib.rcParams['path.simplify'] = False
+
+        matplotlib.rcParams["path.simplify"] = False
 
     init_simulation()
 
@@ -173,14 +177,16 @@ def main(plot_traces=True):
 
     if plot_traces:
         import pylab
+
         pylab.show()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if len(sys.argv) == 1:
         main(plot_traces=True)
-    elif len(sys.argv) == 2 and sys.argv[1] == '--no-plots':
+    elif len(sys.argv) == 2 and sys.argv[1] == "--no-plots":
         main(plot_traces=False)
     else:
         raise Exception(
-            "Script only accepts one argument: --no-plots, not %s" %
-            str(sys.argv))
+            "Script only accepts one argument: --no-plots, not %s" % str(sys.argv)
+        )

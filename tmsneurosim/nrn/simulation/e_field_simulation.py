@@ -1,6 +1,8 @@
 from tmsneurosim.nrn.cells import NeuronCell
 from tmsneurosim.nrn.simulation.simulation import WaveformType
-from tmsneurosim.nrn.simulation.threshold_factor_simulation import ThresholdFactorSimulation
+from tmsneurosim.nrn.simulation.threshold_factor_simulation import (
+    ThresholdFactorSimulation,
+)
 
 
 class EFieldSimulation(ThresholdFactorSimulation):
@@ -8,7 +10,12 @@ class EFieldSimulation(ThresholdFactorSimulation):
     A threshold factor NEURON simulation that has functionality to apply an E-field at each segment.
     """
 
-    def __init__(self, neuron_cell: NeuronCell, waveform_type: WaveformType, e_field_at_segments=None):
+    def __init__(
+        self,
+        neuron_cell: NeuronCell,
+        waveform_type: WaveformType,
+        e_field_at_segments=None,
+    ):
         super().__init__(neuron_cell, waveform_type)
         if e_field_at_segments is not None:
             self.apply_e_field(e_field_at_segments)
@@ -38,12 +45,14 @@ class EFieldSimulation(ThresholdFactorSimulation):
             parent_segment = parent_stack.pop()
 
             for segment in segments:
-                segment.es_xtra = parent_segment.es_xtra - 0.5 * 1e-3 * \
-                                  ((parent_segment.Ex_xtra + segment.Ex_xtra) * (segment.x_xtra - parent_segment.x_xtra)
-                                   + (parent_segment.Ey_xtra + segment.Ey_xtra) * (
-                                           segment.y_xtra - parent_segment.y_xtra)
-                                   + (parent_segment.Ez_xtra + segment.Ez_xtra) * (
-                                           segment.z_xtra - parent_segment.z_xtra))
+                segment.es_xtra = parent_segment.es_xtra - 0.5 * 1e-3 * (
+                    (parent_segment.Ex_xtra + segment.Ex_xtra)
+                    * (segment.x_xtra - parent_segment.x_xtra)
+                    + (parent_segment.Ey_xtra + segment.Ey_xtra)
+                    * (segment.y_xtra - parent_segment.y_xtra)
+                    + (parent_segment.Ez_xtra + segment.Ez_xtra)
+                    * (segment.z_xtra - parent_segment.z_xtra)
+                )
                 parent_segment = segment
 
             children = list(current_section.children())

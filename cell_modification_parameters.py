@@ -14,6 +14,7 @@ class CellModificationParameters:
     """
     A dataclass with parameters for the NeuronCell class.
     """
+
     axon_modification_mode: AxonModificationMode = AxonModificationMode.KEEP_AXON
     soma_area_scaling_factor: float = 1
     axon_diameter_scaling_factor: float = 1
@@ -25,6 +26,7 @@ class CellModificationParameters:
     min_myelin_diameter: float = 0.2
     min_myelin_length: float = 20
     max_myelin_order: int = 0
+
 
 @dataclass
 class MaxhModificationParameters(CellModificationParameters):
@@ -39,7 +41,8 @@ class MaxhModificationParameters(CellModificationParameters):
     apic_diameter_scaling_factor: float = 1.876
     dend_diameter_scaling_factor: float = 1.946
     dend_length_scaling_factor: float = 1.17
-    
+
+
 @dataclass
 class UmaxHModificationParameters(CellModificationParameters):
     """

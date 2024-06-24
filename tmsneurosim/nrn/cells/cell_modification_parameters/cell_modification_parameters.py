@@ -14,6 +14,7 @@ class CellModificationParameters:
     """
     A dataclass with parameters for the NeuronCell class.
     """
+
     axon_modification_mode: AxonModificationMode = AxonModificationMode.KEEP_AXON
     soma_area_scaling_factor: float = 1
     axon_diameter_scaling_factor: float = 1

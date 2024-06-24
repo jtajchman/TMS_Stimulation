@@ -43,9 +43,9 @@ class ThresholdFactorSimulation(Simulation):
         :return: The threshold factor that was found.
         """
         if not self.attached:
-            raise ValueError('Simulation is not attached')
+            raise ValueError("Simulation is not attached")
         if not self.neuron_cell.loaded:
-            raise ValueError('Neuron cell is not loaded')
+            raise ValueError("Neuron cell is not loaded")
         low = 0
         high = 1e5
         amplitude = 100

@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
-from tmsneurosim.nrn.cells.cell_modification_parameters.cell_modification_parameters import CellModificationParameters, \
-    AxonModificationMode
+from tmsneurosim.nrn.cells.cell_modification_parameters.cell_modification_parameters import (
+    CellModificationParameters,
+    AxonModificationMode,
+)
 
 
 @dataclass
