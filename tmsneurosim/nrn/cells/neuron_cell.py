@@ -247,15 +247,15 @@ class NeuronCell:
 
     def _rotate_x_90(self) -> None:
         """Rotates the cell by 90 degree around the x-axis"""
-        for section in self.all:
-            for i in range(section.n3d()):
-                section.pt3dchange(
-                    i,
-                    section.x3d(i),
-                    -section.z3d(i),
-                    section.y3d(i),
-                    section.diam3d(i),
-                )
+        # for section in self.all:
+        #     for i in range(section.n3d()):
+        #         section.pt3dchange(
+        #             i,
+        #             section.x3d(i),
+        #             -section.z3d(i),
+        #             section.y3d(i),
+        #             section.diam3d(i),
+        #         )
         self._setup_xtra()
         self.direction = np.array(
             [self.direction[0], -self.direction[2], self.direction[1]]
