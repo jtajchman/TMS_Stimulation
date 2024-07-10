@@ -1,15 +1,10 @@
-from tmsneurosim.neuron_cell_parser.hoc_neuron_cell_to_py_neuron_cell import (
-    convert_hoc_to_python_cell,
-)
+from tmsneurosim.neuron_cell_parser.hoc_neuron_cell_to_py_neuron_cell import convert_hoc_to_python_cell
 import tmsneurosim.nrn
 import pathlib
 
 nrn_path = pathlib.Path(tmsneurosim.nrn.__file__).parent
-neuron_cell_names = [
-    folder_paths.name
-    for folder_paths in sorted(
-        pathlib.Path(nrn_path.joinpath(f"cells/cells_hoc").absolute()).iterdir()
-    )
+neuron_cell_names = [folder_paths.name for folder_paths in 
+    sorted(pathlib.Path(nrn_path.joinpath(f"cells/cells_hoc").absolute()).iterdir())
     if folder_paths.is_dir()
 ]
 

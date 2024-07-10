@@ -13,6 +13,7 @@ from .tms_efield import get_efield
 
 from netpyne.network import Network
 from netpyne.cell import CompartCell
+from .units import mm, um
 
 
 # From tmseffects/tms_networks/core/TMSSimulation.py
@@ -28,7 +29,7 @@ def build_v_ext(v_seg_values, time_course):
 
 
 # From tmseffects/tms_networks/core/codes/LFPyCell.py
-def insert_v_ext(cell, v_ext, t_ext, totnsegs, section_list):
+def insert_v_ext(cell, v_ext, t_ext, section_list):
     """Set external extracellular potential around cell.
 
     Playback of some extracellular potential v_ext on each cell.totnseg
@@ -48,18 +49,6 @@ def insert_v_ext(cell, v_ext, t_ext, totnsegs, section_list):
     t_ext : ndarray
         Time vector of v_ext
     """
-
-    # test dimensions of input
-    try:
-        if v_ext.shape[0] != totnsegs:
-            raise ValueError("v_ext.shape[0] != len(self.section_list)")  # v
-        if v_ext.shape[1] != t_ext.size:
-            raise ValueError("v_ext.shape[1] != t_ext.size")
-    except:
-        import pdb
-
-        pdb.set_trace()  # v #remov #debug
-        raise ValueError("v_ext, t_ext must both be np.array types")
 
     # create list of extracellular potentials on each segment, time vector
     cell.t_ext = h.Vector(t_ext)
@@ -91,10 +80,6 @@ def flattenLL(LL):
 def calculate_segments_centers(section_list, flatten=False):
     # This is an adaptation of the "grindaway" function from
     # "extracellular_stim_and_rec".
-
-    """NOTE: Neuron sections should ideally have 3D points at the ends of each segment
-    OR: For linear sections, only two points are needed for any number of segments
-    """
 
     segments_centers = []
 
@@ -156,10 +141,6 @@ def calculate_cell_quasipotentials(E_vectors, centers, section_list):
     Calculate quasipotentials by numerical integration of a given
     eletric field's values,
     following the order of segments given by 'self.section_list'.
-
-    E_field : normalized E-field 3D vectors given as a list of lists, where each
-    list contains the vectors for the segments of a given section.
-    In a nonuniform field, a coarsely detailed neuron may result in inaccurate quaipotentials
 
     Reference: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6035313/
     """
@@ -235,26 +216,32 @@ def calculate_cell_quasipotentials(E_vectors, centers, section_list):
     return quasipotentials  # Important: E-field Normalized - varaible technically has units of um; scaling will occur in build_v_ext()
 
 
-def set_E_field(E_field_params: dict, section_list):
+def set_E_field(
+        section_list: list,
+        decay_rate_percent_per_mm: float,
+        E_field_dir: list[float],
+        decay_dir: list[float],
+        ref_point_um: list[float],
+    ):
     """
     Sets electric field vectors defining the stimulus over this cell,
     and calculates quasipotentials (i.e., electric potential under
     the quasistatic assumption).
     """
 
-    sigma = E_field_params["sigma"]
-    E_vector = np.array(E_field_params["field_direction"], dtype=float)
-    decay_dir = np.array(E_field_params["decay_dir"], dtype=float)
+    E_field_dir = np.array(E_field_dir, dtype=float)
+    decay_dir = np.array(decay_dir, dtype=float)
+    ref_point_um = np.array(ref_point_um, dtype=float)
 
-    E_norm = np.linalg.norm(E_vector)
+    E_norm = np.linalg.norm(E_field_dir)
     if E_norm != 0:
-        E_vector = E_vector / E_norm
+        E_field_dir = E_field_dir / E_norm
 
     decay_norm = np.linalg.norm(decay_dir)
     if decay_norm != 0:
         decay_dir = decay_dir / decay_norm
 
-    assert len(E_vector == 3)
+    assert len(E_field_dir == 3)
 
     segments_centers = calculate_segments_centers(section_list)
 
@@ -262,13 +249,14 @@ def set_E_field(E_field_params: dict, section_list):
     # such that E_vector is scaled according to the field experienced at each center
     E_vectors = []
     for sec_segs in segments_centers:
-        sec_ief = []
+        sec_ef = [] # List of electric field vectors at each segment in the section
         for seg_center in sec_segs:
-            ext_field_scalar = (1 - sigma) ** np.dot(
-                np.array(seg_center) / 1000, decay_dir
+            ext_field_scalar = (1 - decay_rate_percent_per_mm/100) ** np.dot(
+                (np.array(seg_center) - ref_point_um) * um / mm, # Convert from um to mm because sigma is defined in mm
+                decay_dir
             )
-            sec_ief.append(E_vector * ext_field_scalar)
-        E_vectors.append(sec_ief)
+            sec_ef.append(E_field_dir * ext_field_scalar)
+        E_vectors.append(sec_ef)
 
     # check
     for i in range(len(E_vectors)):
@@ -285,48 +273,97 @@ def set_E_field(E_field_params: dict, section_list):
     return np.array(flattenLL(quasipotentials))
 
 
-def set_stimulation(cell: CompartCell, params: dict):
+def set_stimulation(
+        cell: CompartCell, 
+        freq_Hz: float,
+        duration_ms: float,
+        pulse_resolution_ms: float,
+        tstart_ms: float,
+        ef_amp_V_per_m: float,
+        width_ms: float,
+        pshape: str,
+        decay_rate_percent_per_mm: float,
+        E_field_dir: list[float],
+        decay_dir: list[float],
+        ref_point_um: list[float],
+    ):
     efield, time = get_efield(
-        freq=params["frequency"],
-        duration=params["stimend"],
-        dt=params["dt"],
-        tstart=params["stimstart"],
-        ef_amp=params["amp"],
-        width=params["pulse_width"],
+        freq_Hz=freq_Hz,
+        duration_ms=duration_ms,
+        pulse_resolution_ms=pulse_resolution_ms,
+        tstart_ms=tstart_ms,
+        ef_amp_V_per_m=ef_amp_V_per_m,
+        width_ms=width_ms,
+        pshape=pshape,
     )
 
     # Populate section_list in order of parent-child structure (depth-first)
     section_list = get_section_list_NetPyNE(cell)
 
-    totnsegs = 0
     for sec in section_list:
-        # Count total number of segments
-        totnsegs += sec.nseg
         # Set extracellular mechanism on all sections
         sec.insert("extracellular")
 
-    E_field_params = {
-        "field_direction": params["field_direction"],
-        "sigma": params["sigma"],
-        "decay_dir": params["decay_dir"],
-    }
-
     v_segments = set_E_field(
-        E_field_params, section_list
-    )  # Sets v_segments as a list of quasipotentials corresponding to each segment in the cell
+        section_list=section_list,
+        decay_rate_percent_per_mm=decay_rate_percent_per_mm,
+        E_field_dir=E_field_dir,
+        decay_dir=decay_dir,
+        ref_point_um=ref_point_um,
+    )  # Returns a list of quasipotentials corresponding to each segment in the cell
 
     # generate v_ext matrix
     v_ext = build_v_ext(v_segments, efield)
     t_ext = np.array(time)
 
     # insert extracellular potentials
-    insert_v_ext(cell, np.array(v_ext), np.array(t_ext), totnsegs, section_list)
+    insert_v_ext(cell, np.array(v_ext), np.array(t_ext), section_list)
 
     return v_segments
 
 
-def apply_tms(net: Network, params: dict):
+def apply_tms(
+        net: Network, 
+        freq_Hz: float,
+        duration_ms: float,
+        pulse_resolution_ms: float,
+        tstart_ms: float,
+        ef_amp_V_per_m: float,
+        pshape: str,
+        width_ms: float,
+        decay_rate_percent_per_mm: float,
+        E_field_dir: list[float],
+        decay_dir: list[float],
+        ref_point_um: list[float],
+    ):
+    """
+    net: NetPyNE network object
+    freq_Hz: Frequency of TMS pulses in Hz
+    duration_ms: Duration of simulation in ms
+    pulse_resolution_ms: Temporal resolution of pulses in ms (independent of simulation dt)
+    tstart_ms: Time of first pulse in ms
+    ef_amp_V_per_m: Amplitude of pulse in V/m
+    width_ms: Period of waveform in ms
+    pshape: Qualitative description of waveform ("Sine" and "Square" are the only currently supported options)
+    decay_rate_percent_per_mm: Rate of exponential decay of electric field in %(V/m)/mm; Valid for (1, 0] (exclusive, inclusive bounds)
+    E_field_dir: Direction of electric field; vector does not need to be normalized
+    decay_dir: Direction along which the decay of the electric field occurs; vector does not need to be normalized
+    ref_point_um: Point in um at which the E-field magnitude = specified amplitude (technically defines a plane normal to decay_dir intersecting this point)
+    """
     print("Applying TMS to network...")
     for cell in net.cells:
-        set_stimulation(cell, params)
+        set_stimulation(
+            cell, 
+            freq_Hz,
+            duration_ms,
+            pulse_resolution_ms,
+            tstart_ms,
+            ef_amp_V_per_m,
+            width_ms,
+            pshape,
+            decay_rate_percent_per_mm,
+            E_field_dir,
+            decay_dir,
+            ref_point_um,
+        )
     return net
