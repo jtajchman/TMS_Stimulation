@@ -60,6 +60,19 @@ proc biophys() {
 		insert pas
 	}
 
+	forsec $o1.somatic {
+		insert NaTs2_t
+		insert SKv3_1
+		insert Ca
+		insert SK_E2
+		insert Ca_LVAst
+		insert Nap_Et2
+		insert Im
+		insert K_Pst
+		insert K_Tst
+		insert CaDynamics_E2
+	}
+
 	forsec $o1.apical {
 		insert NaTs2_t
 		insert SKv3_1
@@ -81,19 +94,6 @@ proc biophys() {
 		insert K_Tst
 		insert Ca_LVAst
 		insert NaTa_t
-	}
-
-	forsec $o1.somatic {
-		insert NaTs2_t
-		insert SKv3_1
-		insert Ca
-		insert SK_E2
-		insert Ca_LVAst
-		insert Nap_Et2
-		insert Im
-		insert K_Pst
-		insert K_Tst
-		insert CaDynamics_E2
 	}
 
 	forsec $o1.all {
@@ -160,27 +160,27 @@ proc biophys() {
 		distribute($o1.axonal,"gK_Tstbar_K_Tst","(0.0 * %g + 1.0)*0.042115")
 		distribute($o1.axonal,"gamma_CaDynamics_E2","(0.0 * %g + 1.0)*0.001739")
 		distribute($o1.axonal,"gNap_Et2bar_Nap_Et2","(0.0 * %g + 1.0)*0.000001")
-		distribute($o1.axonal,"gImbar_Im","(0.0 * %g + 1.0)*0.000554")
+		distribute($o1.axonal,"gCa_LVAstbar_Ca_LVAst","(0.0 * %g + 1.0)*0.009017")
 		distribute($o1.axonal,"gSK_E2bar_SK_E2","(0.0 * %g + 1.0)*0.001224")
 		distribute($o1.axonal,"gK_Pstbar_K_Pst","(0.0 * %g + 1.0)*0.001693")
 		distribute($o1.axonal,"gSKv3_1bar_SKv3_1","(0.0 * %g + 1.0)*0.386953")
 		distribute($o1.axonal,"decay_CaDynamics_E2","(0.0 * %g + 1.0)*468.069681")
 		distribute($o1.axonal,"e_pas","(0.0 * %g + 1.0)*-63.854018")
 		distribute($o1.axonal,"g_pas","(0.0 * %g + 1.0)*0.000008")
-		distribute($o1.axonal,"gCa_LVAstbar_Ca_LVAst","(0.0 * %g + 1.0)*0.009017")
+		distribute($o1.axonal,"gImbar_Im","(0.0 * %g + 1.0)*0.000554")
 		distribute($o1.axonal,"gCabar_Ca","(0.0 * %g + 1.0)*0.000400")
 		distribute($o1.somatic,"gK_Tstbar_K_Tst","(0.0 * %g + 1.0)*0.039863")
-		distribute($o1.somatic,"gK_Pstbar_K_Pst","(0.0 * %g + 1.0)*0.005446")
 		distribute($o1.somatic,"gamma_CaDynamics_E2","(0.0 * %g + 1.0)*0.000500")
 		distribute($o1.somatic,"gNap_Et2bar_Nap_Et2","(0.0 * %g + 1.0)*0.000001")
-		distribute($o1.somatic,"gImbar_Im","(0.0 * %g + 1.0)*0.000478")
+		distribute($o1.somatic,"gCa_LVAstbar_Ca_LVAst","(0.0 * %g + 1.0)*0.003242")
 		distribute($o1.somatic,"gSK_E2bar_SK_E2","(0.0 * %g + 1.0)*0.000523")
-		distribute($o1.somatic,"gNaTs2_tbar_NaTs2_t","(0.0 * %g + 1.0)*0.150747")
+		distribute($o1.somatic,"gK_Pstbar_K_Pst","(0.0 * %g + 1.0)*0.005446")
 		distribute($o1.somatic,"gSKv3_1bar_SKv3_1","(0.0 * %g + 1.0)*0.503893")
 		distribute($o1.somatic,"decay_CaDynamics_E2","(0.0 * %g + 1.0)*645.079741")
 		distribute($o1.somatic,"e_pas","(0.0 * %g + 1.0)*-67.128897")
 		distribute($o1.somatic,"g_pas","(0.0 * %g + 1.0)*0.000100")
-		distribute($o1.somatic,"gCa_LVAstbar_Ca_LVAst","(0.0 * %g + 1.0)*0.003242")
+		distribute($o1.somatic,"gImbar_Im","(0.0 * %g + 1.0)*0.000478")
+		distribute($o1.somatic,"gNaTs2_tbar_NaTs2_t","(0.0 * %g + 1.0)*0.150747")
 		distribute($o1.somatic,"gCabar_Ca","(0.0 * %g + 1.0)*0.000174")
 }
 

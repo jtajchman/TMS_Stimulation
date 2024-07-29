@@ -1,0 +1,10 @@
+https://www.desmos.com/calculator/w29tedp8s7
+
+Notes:
+Uses 1-dimensional math
+
+A = distance from E-field source
+B = width of neural column
+
+As A increases, the approximation gets better (less error)
+As B decreases, the approximation gets better

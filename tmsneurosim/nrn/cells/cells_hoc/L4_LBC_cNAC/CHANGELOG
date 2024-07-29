@@ -1,7 +1,3 @@
-1.0.12: Adding a contributor file,
-        adding placeholder files in python_recordings and hoc_recordings folders, and
-        small improvements to numpy and pylab use in run.py and run_RmpRiTau.py
-1.0.11: Made compatible with python3. Improved README
 1.0.10: Increased the current to calculate the Rin to get above the noise level
         for models with stochastic channels
 1.0.9:  Every model package now contains a cellinfo.json file with e.g. the
