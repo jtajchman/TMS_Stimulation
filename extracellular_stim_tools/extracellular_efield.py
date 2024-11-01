@@ -1,14 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from math import pi, ceil
+from math import pi, ceil, floor
+from neuron import h
 from .units import *
 
 class Shape:
     def __init__(
-        self,
-        shape: str,
-        pulse_width_ms: float,
-    ):
+            self,
+            shape: str,
+            pulse_width_ms: float,
+        ):
         # from sympy import Symbol, Function, diff, lambdify, sin
         import sympy as sp
 
@@ -33,14 +34,14 @@ class Shape:
 
 class Pattern:
     def __init__(
-        self,
-        pulse_shape: Shape,  # Shape of the pulse
-        pattern: str | None = None,  # Pattern of the burst
-        num_tms_pulses_per_burst: int | None = None,  # Number of pulses in a burst
-        pulse_interval_within_burst_ms: float | None = None,  # Duration of interval between pulses in a burst
-        pulse_onset_interval_within_burst_ms: float | None = None,  # Duration of interval between onset of pulses in a burst
-        pulse_freq_within_burst_Hz: float | None = None,  # Frequency of pulse onsets in a burst
-    ):
+            self,
+            pulse_shape: Shape,  # Shape of the pulse
+            pattern: str | None = None,  # Pattern of the burst
+            num_tms_pulses_per_burst: int | None = None,  # Number of pulses in a burst
+            pulse_interval_within_burst_ms: float | None = None,  # Duration of interval between pulses in a burst
+            pulse_onset_interval_within_burst_ms: float | None = None,  # Duration of interval between onset of pulses in a burst
+            pulse_freq_within_burst_Hz: float | None = None,  # Frequency of pulse onsets in a burst
+        ):
         """If pattern is "Single" then num_tms_pulses_per_burst set to 1 (and pulse_interval_within_burst_ms, pulse_onset_interval_within_burst_ms, & pulse_freq_within_burst_Hz are meaningless)
         If "TBS" then num_tms_pulses_per_burst set to 3 (Theta burst stimulation)
 
@@ -100,46 +101,47 @@ class Pattern:
 
 
 def generate_efield(
-    burst_freq_Hz: float | None,  # Frequency of pulse bursts in Hz (meaningless for sTMS & tDCS? (TODO), in which case this is None)
-    simulation_duration_ms: float,  # Duration of waveform
-    dt: float,  # Duration of time step in ms
-    #active_dt: float | None, # Duration of time step in ms when electric field activity is present; defaults to be equivalent to dt TODO
-    stim_start_ms: float,  # Initial waiting period
-    stim_end_ms: float | None, # Time when stimulation ends
-    total_num_tms_pulse_bursts: int | None, # Number of pulse bursts after stim_start_ms
-    efield_amplitude_mV_per_um: float,  # Amplitude of the max E-field in the desired waveform
-    pat: Pattern,  # Pattern object containing data on the waveform
-):
-    rd = 9 # Rounding precision to correct floating point error (rounds to 10^-rd ms)
+        burst_freq_Hz: float | None,  # Frequency of pulse bursts in Hz (meaningless for sTMS & tDCS? (TODO), in which case this is None)
+        simulation_duration_ms: float,  # Duration of waveform
+        dt: float,  # Duration of time step in ms
+        stim_start_ms: float,  # Initial waiting period
+        stim_end_ms: float | None, # Time when stimulation ends
+        total_num_tms_pulse_bursts: int | None, # Number of pulse bursts after stim_start_ms
+        efield_amplitude_mV_per_um: float,  # Amplitude of the max E-field in the desired waveform
+        pat: Pattern,  # Pattern object containing data on the waveform
+        active_dt: float | None = None, # Duration of time step in ms when electric field activity is present; defaults to be equivalent to dt TODO
+        buffer_size_ms: float = 1e-3, # Minimum time buffer between silent and active periods (improves accuracy of interpolation)
+        rd: int = 9, # Rounding precision to correct floating point error (rounds to 10^-rd ms)
+    ):
     efield_waveform_function = pat.pulse_shape.efield_waveform_function  # E-field pulse function (SymPy)
     pulse_width_ms = pat.pulse_shape.pulse_width_ms  # Duration of one pulse
     pulse_onset_interval_within_burst_ms = pat.pulse_onset_interval_within_burst_ms # Duration of interval between the onset of pulses in a burst
     inter_p_interval_ms = pat.pulse_interval_within_burst_ms # Duration of interval between pulses within a burst
     num_tms_pulses_per_burst = pat.num_tms_pulses_per_burst # Number of pulses in one burst
-    burst_width_ms = (num_tms_pulses_per_burst - 1) * inter_p_interval_ms + num_tms_pulses_per_burst * pulse_width_ms # Duration of one burst of pulses (time of intervals + time of pulses)
-    
+    burst_width_ms = round((num_tms_pulses_per_burst - 1) * inter_p_interval_ms + num_tms_pulses_per_burst * pulse_width_ms, rd) # Duration of one burst of pulses (time of intervals + time of pulses)
+
+    # Check parameters
     if total_num_tms_pulse_bursts != None:
         if total_num_tms_pulse_bursts <= 1:
             burst_freq_Hz = None
         elif burst_freq_Hz == None:
             raise ValueError(f"rtms_pulse_burst_freq_Hz must be defined if total_num_tms_pulse_bursts [{total_num_tms_pulse_bursts}] > 1")
             # Situation only applicable/possible with rTMS
-    
+
+    if active_dt == None:
+        active_dt = dt
+
     if burst_freq_Hz != None:
-        burst_onset_interval_ms = 1 / burst_freq_Hz * s # Duration of interval between the onset of bursts of pulses
-        inter_burst_interval_ms = burst_onset_interval_ms - burst_width_ms # Duration of interval between bursts of pulses
+        burst_onset_interval_ms = round(1 / burst_freq_Hz * s, rd) # Duration of interval between the onset of bursts of pulses
+        inter_burst_interval_ms = round(burst_onset_interval_ms - burst_width_ms, rd) # Duration of interval between bursts of pulses
     else:
         burst_onset_interval_ms = None
         inter_burst_interval_ms = None
-    if dt > pulse_width_ms: # Fixes strange behavior with impractically coarse waveform resolution
-        dt = pulse_width_ms # TODO: can remove this when sampling-compatible efield construction is done
 
-
-    # Check one last potential conflict in parameter values
     if inter_burst_interval_ms != None:
         if inter_burst_interval_ms < 0:
             raise ValueError(
-                f"Duration of pulse burst [{burst_width_ms} ms] must be <= interval between pulse burst onset" \
+                f"Duration of pulse burst [{burst_width_ms} ms] must be <= interval between pulse burst onset " \
                     f"(1/rtms_pulse_burst_freq_Hz or 1/tacs_freq_Hz) [{burst_onset_interval_ms} ms]"
             )
 
@@ -149,45 +151,37 @@ def generate_efield(
     time = [] # Points in time
     wav = []  # E-field waveform at each point in time
 
+    # Build burst_start_times_ms
     cur_t = stim_start_ms # Current time as progressing through loop
-    pulse_start_times_ms = [] # List of pulse start times
+    burst_start_times_ms = [] # List of burst start times
     num_bursts = 0 # Number of bursts accounted for
-    while cur_t < stim_end_ms: # Iterate through stim duration and build pulse_start_times
-        for pcount in range(num_tms_pulses_per_burst): # Build one burst
-            pulse_start_times_ms.append(cur_t)
-            if pcount == num_tms_pulses_per_burst-1: # If at the last pulse of the burst
-                cur_t += pulse_width_ms # Advance to the end of the burst
-            else: # If in the middle of a burst
-                cur_t += pulse_onset_interval_within_burst_ms # Advance to the beginning of the next pulse in the burst
+
+    while cur_t < stim_end_ms: # Iterate through stim duration and build burst_start_times_ms
+        burst_start_times_ms.append(cur_t)
         num_bursts += 1
         if total_num_tms_pulse_bursts != None: # If using total_num_tms_pulse_bursts
             if num_bursts >= total_num_tms_pulse_bursts: # And the number of bursts has reached the total limit
                 break # End the building process
-        cur_t += inter_burst_interval_ms # If not, advance to the start of the next burst
+        cur_t += burst_onset_interval_ms # If not, advance to the start of the next burst
 
-    pulse_end_times_ms = [start_time + pulse_width_ms for start_time in pulse_start_times_ms]
+    pulse_start_times_ms = [] # List of pulse start times
+    for burst_start_time in burst_start_times_ms:
+        for pulsenum in range(num_tms_pulses_per_burst):
+            pulse_start_times_ms.extend([burst_start_time + pulse_onset_interval_within_burst_ms*pulsenum])
 
-    # if inter_burst_interval_ms != None:
-    #     while cur_t < stim_end_ms and num_bursts < total_num_tms_pulse_bursts: # Iterate through duration and build pulse_start_times
-    #         for pcount in range(num_tms_pulses_per_burst):
-    #             pulse_start_times.append(cur_t)
-    #             if pcount == num_tms_pulses_per_burst-1: # If at the end of the burst
-    #                 cur_t += inter_burst_interval_ms + pulse_width_ms
-    #             else: # If in the middle of a burst
-    #                 cur_t += pulse_onset_interval_within_burst_ms
-    # else:
-    #     for pcount in range(num_tms_pulses_per_burst):
-    #         pulse_start_times.append(cur_t)
-    #         cur_t += pulse_onset_interval_within_burst_ms
+    pulse_end_times_ms = [round(start_time + pulse_width_ms, rd) for start_time in pulse_start_times_ms]
+    for ind, pulse_end_time in reversed(list(enumerate(pulse_end_times_ms))):
+        if pulse_end_time in pulse_start_times_ms:
+            pulse_end_times_ms.pop(ind)
 
-    effective_pulse_time_steps = ceil(pulse_width_ms / dt)
-    effective_pulse_width_ms = int(effective_pulse_time_steps * dt) # Effective length of pulse when accounting for sampling resolution
+    # Define a single pulse (noninclusive to last time step)
+    sampled_pulse_time_steps = ceil(pulse_width_ms / active_dt) - 1
+    sampled_pulse_width_ms = sampled_pulse_time_steps * active_dt # Effective length of pulse when accounting for sampling resolution & excluding last time step
+    npoints_pulse = sampled_pulse_time_steps + 1  # Number of time points within a pulse
     if pat.pulse_shape.shape == "Ideal_Square":
         npoints_pulse = 2 # Only need the first and last time point of the pulse, as it does not change over the duration
-    else:
-        npoints_pulse = effective_pulse_time_steps + 1  # Number of time points within a pulse
-    pulse_t = np.linspace(0, effective_pulse_width_ms, npoints_pulse) # Time points within a pulse starting at t=0
-    print(pulse_t)
+    
+    pulse_t = np.linspace(0, sampled_pulse_width_ms, npoints_pulse) # Time points within a pulse starting at t=0
     pulse = [efield_waveform_function(t) * efield_amplitude_mV_per_um for t in pulse_t] # Sample points of the pulse waveform; scale by efield_amplitude_mV_per_um
     
     if stim_start_ms > 0:
@@ -195,23 +189,10 @@ def generate_efield(
         time.append(0)
         wav.append(0)
 
-    # TODO: write time & wav in a loop so that sampling is represented accurately
-    # current_time_ms = 0
-    # completed_pulses = 0
-    # while current_time_ms < simulation_duration_ms:
-    #     # Check whether we are within a pulse
-    #     if current_time_ms >= pulse_start_times_ms[completed_pulses] and \
-    #         current_time_ms <= pulse_end_times_ms[completed_pulses]:
-    #         # Do something
-        
-    #     # Check whether a pulse has just ended and we are not within another pulse
-    #         # Add post-pulse buffer
-    #         pass
-
     pulse_end_time = 0
     for i, pulse_start in enumerate(pulse_start_times_ms):
         # Pre-pulse buffer
-        last_silent_t = pulse_start - dt # Last time point of silent period before pulse start
+        last_silent_t = pulse_start - buffer_size_ms # Last time point of silent period before pulse start
         if last_silent_t > pulse_end_time: # If we've advanced far enough to need to specify the end of the silent period
             # Write end of silent period
             time.append(last_silent_t)
@@ -222,12 +203,11 @@ def generate_efield(
         wav.extend(pulse)
 
         # Post-pulse buffer
-        pulse_end_time = pulse_start + effective_pulse_width_ms # Time of the end of the pulse
-        start_silent_t = pulse_end_time + dt # First time point of silent period after pulse end
+        pulse_end_time = pulse_start + pulse_width_ms # Time of the end of the pulse
         if (i == len(pulse_start_times_ms)-1 # If this is the last pulse
-            or start_silent_t < pulse_start_times_ms[i+1]): # or if we will advance far enough to need to specify the start of a silent period
+            or pulse_end_time < pulse_start_times_ms[i+1] - buffer_size_ms): # or if we will advance far enough to need to specify the start of a silent period
             # Write start of silent period
-            time.append(start_silent_t)
+            time.append(pulse_end_time)
             wav.append(0)
     # Buffers necessary for simulation time steps when outside of a pulse
 
@@ -249,14 +229,23 @@ def generate_efield(
         time = time[:ind_last_t+2] # +2 because we want to still include the last point before and the first point after the duration
         wav = wav[:ind_last_t+2]
 
-    return [wav, time]
+    def NetPyNE_interval_func(t):
+        # if within pulse
+            # h.dt = pulse_dt
+        # elif outside pulse
+            # h.dt = default_dt
+        # if within one time step of next fixed point
+            # h.dt = fixed_point_t - t
+
+    return [wav, time, pulse_start_times_ms, pulse_end_times_ms]
+
 
 def check_nonspecific_parameters(
-    simulation_duration_ms,
-    stim_start_ms,
-    stim_end_ms,
-    sampling_period_ms
-):
+        simulation_duration_ms,
+        stim_start_ms,
+        stim_end_ms,
+        sampling_period_ms
+    ):
     # Check that the parameters which are not specific to stimulation type are valid
     if simulation_duration_ms <= 0:
         raise ValueError(f"simulation_duration_ms [{simulation_duration_ms}] must be > 0")
@@ -273,8 +262,9 @@ def check_nonspecific_parameters(
         raise ValueError(f"sampling_period_ms [{sampling_period_ms}] must be > 0")
     return stim_end_ms
     
+
 def plot_efield(wav, time):
-    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+    fig, ax = plt.subplots(1, 2, figsize=(15, 5))
     fig.suptitle("E-field Plots")
     ax[0].step(time, wav, where="post")
     ax[0].set_title("Raw Step Function")
@@ -284,36 +274,38 @@ def plot_efield(wav, time):
     ax[1].plot(time, wav)
     ax[1].set_title("Interpolated Function")
     ax[1].set_xlabel("Time (ms)")
-    #ax[1].set_ylabel("E-field (mV/um)")
-    
-    dt = 0.025
-    num_sample_steps = ceil(time[-1] / dt)
-    effective_duration_ms = int(num_sample_steps * dt)
-    num_sample_points = num_sample_steps + 1  # Number of time points within the duration
-    sampled_time = np.linspace(0, effective_duration_ms, num_sample_points, endpoint=False)
-    sampled_time = np.append(sampled_time, time[-1])
 
-    sampled_wav = np.interp(sampled_time, time, wav)
+    # cur_t = 0
+    # for start in pulse_start_times_ms:
+        
 
-    ax[2].step(sampled_time, sampled_wav, where="post")
-    ax[2].set_title(f"Sampled Step Function with dt={dt} ms")
-    ax[2].set_xlabel("Time (ms)")
-    #ax[2].set_ylabel("E-field (mV/um)")
+    # num_sample_steps = ceil(time[-1] / dt)
+    # effective_duration_ms = num_sample_steps * dt
+    # num_sample_points = num_sample_steps + 1  # Number of time points within the duration
+    # sampled_time = np.linspace(0, effective_duration_ms, num_sample_points, endpoint=False)
+    # sampled_time = np.append(sampled_time, time[-1])
+
+    # sampled_wav = np.interp(sampled_time, time, wav)
+
+    # ax[2].step(sampled_time, sampled_wav, where="post")
+    # ax[2].set_title(f"Sampled Step Function with dt={dt} ms")
+    # ax[2].set_xlabel("Time (ms)")
+
 
 def get_efield_sTMS(
-    simulation_duration_ms: float,
-    efield_amplitude_V_per_m: float,
-    stim_start_ms: float = 0.,
-    sampling_period_ms: float = 1e-3,
-    tms_pulse_shape: str = "Ideal_Sine",
-    tms_pulse_width_ms: float = 100e-3,
-    tms_pulse_burst_pattern: str = "Single",
-    num_tms_pulses_per_burst: int | None = None,
-    pulse_interval_within_burst_ms: float | None = None,
-    pulse_onset_interval_within_burst_ms: float | None = None,
-    pulse_freq_within_burst_Hz: float | None = None,
-    plot: bool = False,
-):
+        simulation_duration_ms: float,
+        efield_amplitude_V_per_m: float,
+        stim_start_ms: float = 0.,
+        sampling_period_ms: float = 1e-3,
+        tms_pulse_shape: str = "Ideal_Sine",
+        tms_pulse_width_ms: float = 100e-3,
+        tms_pulse_burst_pattern: str = "Single",
+        num_tms_pulses_per_burst: int | None = None,
+        pulse_interval_within_burst_ms: float | None = None,
+        pulse_onset_interval_within_burst_ms: float | None = None,
+        pulse_freq_within_burst_Hz: float | None = None,
+        plot: bool = False,
+    ):
     """
     simulation_duration_ms: Duration of simulation in ms
     efield_amplitude_V_per_m: Amplitude of electric field pulse in V/m TODO: Typical values for stim type
@@ -341,7 +333,7 @@ def get_efield_sTMS(
 
 
 
-    wav, time = generate_efield(
+    wav, time, pulse_start_times_ms, pulse_end_times_ms = generate_efield(
         burst_freq_Hz=None,
         simulation_duration_ms=simulation_duration_ms,  
         dt=sampling_period_ms, 
@@ -364,23 +356,24 @@ def get_efield_sTMS(
     
     return wav, time
     
+
 def get_efield_rTMS(
-    simulation_duration_ms: float,
-    efield_amplitude_V_per_m: float,
-    rtms_pulse_burst_freq_Hz: float,
-    stim_start_ms: float = 0.,
-    stim_end_ms: float | None = None,
-    total_num_tms_pulse_bursts: int | None = None,
-    sampling_period_ms: float = 1e-3,
-    tms_pulse_shape: str = "Ideal_Sine",
-    tms_pulse_width_ms: float = 100e-3,
-    tms_pulse_burst_pattern: str = "Single",
-    num_tms_pulses_per_burst: int | None = None,
-    pulse_interval_within_burst_ms: float | None = None,
-    pulse_onset_interval_within_burst_ms: float | None = None,
-    pulse_freq_within_burst_Hz: float | None = None,
-    plot: bool = False,
-):
+        simulation_duration_ms: float,
+        efield_amplitude_V_per_m: float,
+        rtms_pulse_burst_freq_Hz: float,
+        stim_start_ms: float = 0.,
+        stim_end_ms: float | None = None,
+        total_num_tms_pulse_bursts: int | None = None,
+        sampling_period_ms: float = 1e-3,
+        tms_pulse_shape: str = "Ideal_Sine",
+        tms_pulse_width_ms: float = 100e-3,
+        tms_pulse_burst_pattern: str = "Single",
+        num_tms_pulses_per_burst: int | None = None,
+        pulse_interval_within_burst_ms: float | None = None,
+        pulse_onset_interval_within_burst_ms: float | None = None,
+        pulse_freq_within_burst_Hz: float | None = None,
+        plot: bool = False,
+    ):
     """
     simulation_duration_ms: Duration of simulation in ms
     efield_amplitude_V_per_m: Amplitude of electric field pulse in V/m TODO: Typical values for stim type
@@ -416,10 +409,15 @@ def get_efield_rTMS(
     if total_num_tms_pulse_bursts != None:
         if total_num_tms_pulse_bursts < 0:
             raise ValueError(f"total_num_tms_pulse_bursts [{total_num_tms_pulse_bursts}] must be >= 0")
+    if rtms_pulse_burst_freq_Hz == None:
+        raise ValueError(f"rtms_pulse_burst_freq_Hz must be defined")
     if rtms_pulse_burst_freq_Hz <= 0:
         raise ValueError(f"rtms_pulse_burst_freq_Hz [{rtms_pulse_burst_freq_Hz}] must be > 0")
+    if efield_amplitude_V_per_m == None:
+        raise ValueError(f"efield_amplitude_V_per_m must be defined")
 
-    wav, time = generate_efield(
+
+    wav, time, pulse_start_times_ms, pulse_end_times_ms = generate_efield(
         burst_freq_Hz=rtms_pulse_burst_freq_Hz,
         simulation_duration_ms=simulation_duration_ms,  
         dt=sampling_period_ms, 
@@ -442,15 +440,16 @@ def get_efield_rTMS(
     
     return wav, time
     
+
 def get_efield_tACS(
-    simulation_duration_ms: float,
-    efield_amplitude_V_per_m: float,
-    stim_start_ms: float = 0.,
-    stim_end_ms: float | None = None,
-    sampling_period_ms: float = 25e-3,
-    tacs_freq_Hz: float | None = None,
-    plot: bool = False,
-):
+        simulation_duration_ms: float,
+        efield_amplitude_V_per_m: float,
+        stim_start_ms: float = 0.,
+        stim_end_ms: float | None = None,
+        sampling_period_ms: float = 25e-3,
+        tacs_freq_Hz: float | None = None,
+        plot: bool = False,
+    ):
     """
     simulation_duration_ms: Duration of simulation in ms
     efield_amplitude_V_per_m: Amplitude of electric field pulse in V/m TODO: Typical values for stim type
@@ -475,7 +474,7 @@ def get_efield_tACS(
     if tacs_freq_Hz <= 0:
         raise ValueError(f"tacs_freq_Hz [{tacs_freq_Hz}] must be > 0")
 
-    wav, time = generate_efield(
+    wav, time, pulse_start_times_ms, pulse_end_times_ms = generate_efield(
         burst_freq_Hz=tacs_freq_Hz,
         simulation_duration_ms=simulation_duration_ms,  
         dt=sampling_period_ms, 
@@ -494,14 +493,15 @@ def get_efield_tACS(
     
     return wav, time
     
+
 def get_efield_tDCS(
-    simulation_duration_ms: float,
-    efield_amplitude_V_per_m: float,
-    stim_start_ms: float = 0.,
-    stim_end_ms: float | None = None,
-    sampling_period_ms: float = 1e-3,
-    plot: bool = False,
-):
+        simulation_duration_ms: float,
+        efield_amplitude_V_per_m: float,
+        stim_start_ms: float = 0.,
+        stim_end_ms: float | None = None,
+        sampling_period_ms: float = 1e-3,
+        plot: bool = False,
+    ):
     """
     simulation_duration_ms: Duration of simulation in ms
     efield_amplitude_V_per_m: Amplitude of electric field pulse in V/m TODO: Typical values for stim type
@@ -521,7 +521,7 @@ def get_efield_tDCS(
         sampling_period_ms=sampling_period_ms
     )
 
-    wav, time = generate_efield(
+    wav, time, pulse_start_times_ms, pulse_end_times_ms = generate_efield(
         burst_freq_Hz=None,
         simulation_duration_ms=simulation_duration_ms,  
         dt=sampling_period_ms, 
@@ -539,3 +539,14 @@ def get_efield_tDCS(
         plot_efield(wav, time)
     
     return wav, time
+
+
+def get_efield(stim_type: str, **kwargs):
+    if stim_type == 'sTMS':
+        return get_efield_sTMS(**kwargs)
+    elif stim_type == 'rTMS':
+        return get_efield_rTMS(**kwargs)
+    elif stim_type == 'tACS':
+        return get_efield_tACS(**kwargs)
+    elif stim_type == 'tDCS':
+        return get_efield_tDCS(**kwargs)
