@@ -4,10 +4,10 @@
 # Edited & expanded for use in NetPyNE by Jacob Tajchman
 
 # TODO:
-# Design Netpyne interval function to force time points and change time step
-# TEST E-field angles in spherical coordinates
+# Test Netpyne interval function to force time points and change time step
+# Test E-field angles in spherical coordinates
+# Test E-field waveform generation
 # Experimentally measured TMS waveforms
-# More E-field waveform generation testing
 # Revise input parameter formats (combine degenerate parameters into one)
     # Instead of "define parameter A = ~ or parameter B = ~"
     # Change to "define parameter A_or_B = ('A', ~) or ('B', ~)"
