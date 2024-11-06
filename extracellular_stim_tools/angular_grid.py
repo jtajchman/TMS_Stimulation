@@ -1,9 +1,5 @@
 import numpy as np
-from numpy import pi
-from math import ceil, sin, radians, degrees
-from mpl_toolkits.mplot3d import Axes3D 
-import matplotlib.pyplot as plt 
-from .spherical_cartesian_conversion import norm_spherical_to_cartesian
+from math import ceil, sin, radians
 
 def get_angles(polar_resolution, azimuthal_resolution):
     num_polar_angles = ceil(180/polar_resolution)+1
@@ -24,29 +20,3 @@ def get_num_azimuthal_angles(polar_angle, azimuthal_resolution):
 
 def unpack_angles(angles):
     return [[angle[0], azimuth] for angle in angles for azimuth in angle[1]]
-
-def main():
-    # print(get_num_azimuthal_angles(90, 60))
-    angles = get_angles(10, 90)
-    angle_list = unpack_angles(angles)
-    xs = []
-    ys = []
-    zs = []
-    for angle in angle_list:
-        x, y, z = norm_spherical_to_cartesian(angle[0], angle[1])
-        xs.append(x)
-        ys.append(y)
-        zs.append(z)
-    
-    fig = plt.figure() 
-    ax = Axes3D(fig)
-
-    ax.scatter(xs, ys, zs, color='green') 
-    ax.set_title("3D plot") 
-    ax.set_xlabel('x-axis') 
-    ax.set_ylabel('y-axis') 
-    ax.set_zlabel('z-axis') 
-    plt.show()
-
-if __name__ == '__main__':
-    main()

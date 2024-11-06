@@ -5,9 +5,10 @@
 
 # TODO:
 # Test Netpyne interval function to force time points and change time step
-# Test E-field angles in spherical coordinates
+# Test parallelization of coord_rotations, as it uses warnings.catch_warnings(), which is undefined for multi-threaded applications
 # Test E-field waveform generation
 # Experimentally measured TMS waveforms
+# Implement num_time_steps_in_pulse as alternative to active_dt
 # Revise input parameter formats (combine degenerate parameters into one)
     # Instead of "define parameter A = ~ or parameter B = ~"
     # Change to "define parameter A_or_B = ('A', ~) or ('B', ~)"
@@ -112,7 +113,40 @@ def flattenLL(LL):
     return [x for L0 in LL for x in L0]
 
 
-def calculate_segments_centers(section_list, flatten=False):
+def plot_quasipotentials(quasipotentials, centers):
+    from mpl_toolkits.mplot3d import Axes3D 
+    import matplotlib.pyplot as plt 
+    
+    quasipotentials = flattenLL(quasipotentials)
+    centers = flattenLL(centers)
+
+    xs = np.array([center[0] for center in centers])
+    ys = np.array([center[1] for center in centers])
+    zs = np.array([center[2] for center in centers])
+
+    ax = plt.figure().add_subplot(projection='3d')
+
+    scatter = ax.scatter(xs, zs, ys, c=quasipotentials, cmap='bwr') 
+    ax.set_aspect('equal')
+    ax.set_title("Cell Quasipotentials\n(Field points from positive to negative potential)") 
+    ax.set_xlabel('x-axis') 
+    ax.set_ylabel('z-axis') 
+    ax.set_zlabel('y-axis') 
+    ax.invert_yaxis()
+    cbar = plt.colorbar(scatter)
+    cbar.ax.set_ylabel('Quasipotentials (mV)')
+
+    # scatter = ax.scatter(xs, ys, zs, c=quasipotentials, cmap='bwr') 
+    # ax.set_aspect('equal')
+    # ax.set_title("Cell Quasipotentials\n(Field points from positive to negative potential)") 
+    # ax.set_xlabel('x-axis') 
+    # ax.set_ylabel('y-axis') 
+    # ax.set_zlabel('z-axis') 
+    # cbar = plt.colorbar(scatter)
+    # cbar.ax.set_ylabel('Quasipotentials (mV)')
+
+
+def calculate_segments_centers(section_list):
     # This is an adaptation of the "grindaway" function from
     # "extracellular_stim_and_rec".
 
@@ -163,12 +197,8 @@ def calculate_segments_centers(section_list, flatten=False):
 
         segments_centers.append(np.array(section_seg_centers))
 
-    # returns centers, either flattened
-    # (i.e., each element is a segment center) or grouped by section.
-    if flatten:
-        return np.array(flattenLL(segments_centers))
-    else:
-        return np.array(segments_centers, dtype=object)
+    # returns centers grouped by section.
+    return np.array(segments_centers, dtype=object)
 
 
 def calculate_cell_quasipotentials(E_vectors, centers, section_list):
@@ -258,6 +288,7 @@ def set_E_field(
         decay_dir: dict,
         ref_point_um: list[float],
         somatodendritic_axis: list[float],
+        plot: bool,
     ):
     """
     Sets electric field vectors defining the stimulus over this cell,
@@ -293,6 +324,9 @@ def set_E_field(
         E_vectors, segments_centers, section_list
     )
 
+    if plot:
+        plot_quasipotentials(quasipotentials, segments_centers)
+
     # values of electric potential at segments centers, but flattened,
     # i.e., not grouped by sections.
     # (in 'self.quasipotentials', they are grouped by section.)
@@ -306,13 +340,11 @@ def set_stimulation(
         decay_dir: dict,
         ref_point_um: list[float],
         somatodendritic_axis: list[float],
-        stim_type: str,
-        **waveform_params,
+        plot: bool,
+        wav: list,
+        time: list,
     ):
-    wav, time = get_efield(
-            stim_type=stim_type,
-            **waveform_params,
-        )
+
 
     # Populate section_list in order of parent-child structure (depth-first)
     section_list = get_section_list_NetPyNE(cell)
@@ -328,6 +360,7 @@ def set_stimulation(
         decay_dir=decay_dir,
         ref_point_um=ref_point_um,
         somatodendritic_axis=somatodendritic_axis,
+        plot=plot,
     )  # Returns a list of quasipotentials corresponding to each segment in the cell
 
     # generate v_ext matrix
@@ -339,59 +372,6 @@ def set_stimulation(
 
     return v_segments
 
-'''
-    # def apply_extracellular_stim(
-    #         net: Network, 
-    #         stim_type: str,
-    #         freq_Hz: float,
-    #         duration_ms: float,
-    #         pulse_resolution_ms: float,
-    #         stim_start_ms: float,
-    #         stim_end_ms: float,
-    #         ef_amp_V_per_m: float,
-    #         pshape: str,
-    #         width_ms: float,
-    #         decay_rate_percent_per_mm: float,
-    #         E_field_dir: list[float],
-    #         decay_dir: list[float],
-    #         ref_point_um: list[float],
-    #     ):
-    #     """
-    #     net: NetPyNE network object
-    #     freq_Hz: Frequency of TMS pulses in Hz
-    #     duration_ms: Duration of simulation in ms
-    #     pulse_resolution_ms: Temporal resolution of pulses in ms (independent of simulation dt)
-    #     stim_start_ms: Time of first pulse in ms
-    #     stim_end_ms: Time when stimulation ends in ms
-    #     ef_amp_V_per_m: Amplitude of pulse in V/m
-    #     width_ms: Period of waveform in ms
-    #     pshape: Qualitative description of waveform ("Sine" and "Square" are the only currently supported options)
-    #     decay_rate_percent_per_mm: Rate of exponential decay of electric field in %(V/m)/mm; Valid for (1, 0] (exclusive, inclusive bounds)
-    #     E_field_dir: Direction of electric field; vector does not need to be normalized
-    #     decay_dir: Direction along which the decay of the electric field occurs; vector does not need to be normalized
-    #     ref_point_um: Point in um at which the E-field magnitude = specified amplitude (technically defines a plane normal to decay_dir intersecting this point)
-    #     """
-    #     print(f"Applying extracellular stim ({stim_type}) to network...")
-    #     for cell in net.cells:
-    #         set_stimulation(
-    #             cell, 
-    #             stim_type, 
-    #             freq_Hz,
-    #             duration_ms,
-    #             pulse_resolution_ms,
-    #             stim_start_ms,
-    #             stim_end_ms,
-    #             ef_amp_V_per_m,
-    #             width_ms,
-    #             pshape,
-    #             decay_rate_percent_per_mm,
-    #             E_field_dir,
-    #             decay_dir,
-    #             ref_point_um,
-    #         )
-    #     return net
-'''
-
 def apply_extracellular_stim(
         cells_list: list, 
         stim_type: str,
@@ -400,6 +380,7 @@ def apply_extracellular_stim(
         decay_dir: dict,
         somatodendritic_axis: list[float],
         ref_point_um: list[float] = [0, 0, 0],
+        plot: bool = False,
         **waveform_params,
     ):
     """
@@ -418,6 +399,12 @@ def apply_extracellular_stim(
     ref_point_um: Point in um at which the E-field magnitude = specified amplitude (technically defines a plane normal to decay_dir intersecting this point)
     """
     print(f"Applying extracellular stim ({stim_type}) to network...")
+
+    wav, time, interval_func = get_efield(
+            stim_type=stim_type,
+            **waveform_params,
+        )
+    
     for cell in cells_list:
         set_stimulation(
             cell, 
@@ -426,6 +413,9 @@ def apply_extracellular_stim(
             decay_dir,
             ref_point_um,
             somatodendritic_axis,
-            stim_type, 
-            **waveform_params,
+            plot,
+            wav, 
+            time,
         )
+    
+    return interval_func

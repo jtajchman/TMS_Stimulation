@@ -224,11 +224,18 @@ def generate_efield(
     def NetPyNE_interval_func(t):
         ind_last_pulse_start = np.argmax(start for start in pulse_start_times_ms if start <= t)
         last_pulse_start = pulse_start_times_ms[ind_last_pulse_start]
-        next_pulse_start = pulse_start_times_ms[ind_last_pulse_start+1]
+        if ind_last_pulse_start + 1 < len(pulse_start_times_ms): # If there are more pulses
+            next_pulse_start = pulse_start_times_ms[ind_last_pulse_start+1] # Set next_pulse_start
+        else:
+            next_pulse_start = -1 # Else flag next as invalid
 
+        # Same for pulse end events
         ind_last_pulse_end = np.argmax(end for end in pulse_end_times_ms if end <= t)
         last_pulse_end = pulse_end_times_ms[ind_last_pulse_end]
-        next_pulse_end = pulse_end_times_ms[ind_last_pulse_end+1]
+        if ind_last_pulse_end + 1 < len(pulse_end_times_ms):
+            next_pulse_end = pulse_end_times_ms[ind_last_pulse_end+1]
+        else:
+            next_pulse_end = -1
         
         within_pulse = last_pulse_start >= last_pulse_end # Within a pulse if the last time a pulse started was more recent than the last time one ended
         if within_pulse:
@@ -237,8 +244,9 @@ def generate_efield(
             h.dt = default_dt
         
         next_event = min([next_pulse_start, next_pulse_end])
-        if t + h.dt > next_event: # If we would step over the next event
-            h.dt = next_event - t # Set dt so that we will hit the event exactly
+        if next_event != -1:
+            if t + h.dt > next_event: # If we would step over the next event
+                h.dt = next_event - t # Set dt so that we will hit the event exactly
 
     return wav, time, NetPyNE_interval_func
 
@@ -307,11 +315,11 @@ def plot_efield(wav, time):
 def get_efield_sTMS(
         simulation_duration_ms: float,
         efield_amplitude_V_per_m: float,
+        num_pulses_per_burst: int,
         stim_start_ms: float = 0.,
         default_dt: float = 25e-3,
         tms_pulse_shape: str = "Ideal_Sine",
         tms_pulse_width_ms: float = 100e-3,
-        num_pulses_per_burst: int | None = None,
         pulse_interval_within_burst_ms: float | None = None,
         pulse_onset_interval_within_burst_ms: float | None = None,
         pulse_freq_within_burst_Hz: float | None = None,

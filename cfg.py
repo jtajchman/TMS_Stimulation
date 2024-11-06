@@ -12,7 +12,7 @@ from tmsneurosim.nrn.cells import NeuronCell
 
 cfg = specs.SimConfig()
 
-cfg.duration = 100  ## Duration of the sim, in ms
+cfg.duration = 20  ## Duration of the sim, in ms
 cfg.dt = 0.025
 cfg.seeds = {"conn": 4321, "stim": 1234, "loc": 4321}
 cfg.hParams = {"celsius": 34, "v_init": -70}
