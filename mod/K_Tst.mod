@@ -55,8 +55,8 @@ INITIAL{
 
 PROCEDURE rates(){
   LOCAL qt
-  :qt = 2.3^((34-21)/10)
-  qt = 2.3^((celsius-21)/10)
+  qt = 2.3^((34-21)/10)
+
 	UNITSOFF
 		v = v + 10
 		mInf =  1/(1 + exp(-(v+0)/19))

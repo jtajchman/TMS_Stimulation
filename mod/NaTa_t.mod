@@ -3,7 +3,7 @@
 NEURON	{
 	SUFFIX NaTa_t
 	USEION na READ ena WRITE ina
-	RANGE gNaTa_tbar, gNaTa_t, ina, mtau_scale, htau_scale
+	RANGE gNaTa_tbar, gNaTa_t, ina
 }
 
 UNITS	{
@@ -13,7 +13,7 @@ UNITS	{
 }
 
 PARAMETER	{
-	gNaTa_tbar = 0.00001 (S/cm2)	
+	gNaTa_tbar = 0.00001 (S/cm2)
 }
 
 ASSIGNED	{
@@ -56,8 +56,8 @@ INITIAL{
 
 PROCEDURE rates(){
   LOCAL qt
-  :qt = 2.3^((34-21)/10)
-  qt = 2.3^((celsius-21)/10)
+  qt = 2.3^((34-21)/10)
+	
   UNITSOFF
     if(v == -38){
     	v = v+0.0001

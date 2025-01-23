@@ -85,7 +85,6 @@ extern void _StochKv_reg();
 extern void _StochKv_deterministic_reg();
 extern void _tia_reg();
 extern void _vecstim_reg();
-extern void _xtra_reg();
 
 void modl_reg(){
 	//nrn_mswindll_stdio(stdin, stdout, stderr);
@@ -174,7 +173,6 @@ fprintf(stderr," StochKv.mod");
 fprintf(stderr," StochKv_deterministic.mod");
 fprintf(stderr," tia.mod");
 fprintf(stderr," vecstim.mod");
-fprintf(stderr," xtra.mod");
 fprintf(stderr, "\n");
     }
 _ar_traub_reg();
@@ -259,5 +257,4 @@ _StochKv_reg();
 _StochKv_deterministic_reg();
 _tia_reg();
 _vecstim_reg();
-_xtra_reg();
 }

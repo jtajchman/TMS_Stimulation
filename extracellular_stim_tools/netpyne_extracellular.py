@@ -4,11 +4,9 @@
 # Edited & expanded for use in NetPyNE by Jacob Tajchman
 
 # TODO:
-# Test Netpyne interval function to force time points and change time step
-# Test parallelization of coord_rotations, as it uses warnings.catch_warnings(), which is undefined for multi-threaded applications
+# Further test Netpyne interval function to force time points and change time step
 # Test E-field waveform generation
-# Experimentally measured TMS waveforms
-# Implement num_time_steps_in_pulse as alternative to active_dt
+# Experimentally measured TMS waveforms - cTMS
 # Revise input parameter formats (combine degenerate parameters into one)
     # Instead of "define parameter A = ~ or parameter B = ~"
     # Change to "define parameter A_or_B = ('A', ~) or ('B', ~)"
@@ -16,13 +14,8 @@
 
 # math
 import numpy as np
-from .spherical_cartesian_conversion import (
-    cartesian_to_spherical, 
-    spherical_to_cartesian, 
-    norm_cartesian_to_spherical, 
-    norm_spherical_to_cartesian
-    )
-from .coord_rotations import rotate_coords_from_axis, get_rotation, rotate_coords
+from .spherical_cartesian_conversion import norm_spherical_to_cartesian
+from .coord_rotations import rotate_coords_from_pos_z_to_axis
 
 # NEURON
 from neuron import h
@@ -33,54 +26,11 @@ from netpyne.network import Network
 from netpyne.cell import CompartCell
 from .units import mm, um
 
-
-# From tmseffects/tms_networks/core/TMSSimulation.py
-def build_v_ext(v_seg_values, time_course):
-    v_ext = np.zeros((len(v_seg_values), len(time_course)))
-
-    for i in range(len(v_seg_values)):
-        # v_seg_values contains normalized quasipotentials for each segment (units um)
-        # time_course contains E-field values over time (units mV/um)
-        v_ext[i, :] = [v_seg_values[i] * vt for vt in time_course]  # mV
-
-    return v_ext
-
-
-# From tmseffects/tms_networks/core/codes/LFPyCell.py
-def insert_v_ext(cell, v_ext, t_ext, section_list):
-    """Set external extracellular potential around cell.
-
-    Playback of some extracellular potential v_ext on each cell.totnseg
-    compartments. Assumes that the "extracellular"-mechanism is inserted
-    on each compartment.
-    Can be used to study ephaptic effects and similar
-    The inputs will be copied and attached to the cell object as
-    cell.v_ext, cell.t_ext, and converted
-    to (list of) neuron.h.Vector types, to allow playback into each
-    compartment e_extracellular reference.
-    Can not be deleted prior to running cell.simulate()
-
-    Parameters
-    ----------
-    v_ext : ndarray
-        Numpy array of size cell.totnsegs x t_ext.size, unit mV
-    t_ext : ndarray
-        Time vector of v_ext
-    """
-
-    # create list of extracellular potentials on each segment, time vector
-    cell.t_ext = h.Vector(t_ext)
-    cell.v_ext = []
-    for v in v_ext:
-        cell.v_ext.append(h.Vector(v))
-
-    # play v_ext into e_extracellular reference
-    i = 0
-    for sec in section_list:  # v
-        for seg in sec:
-            cell.v_ext[i].play(seg._ref_e_extracellular, cell.t_ext, True)
-            # print(seg is sec(seg.x))
-            i += 1
+# From tmseffects/tms_networks/core/codes/list_routines.py
+def flattenLL(LL):
+    """Flattens a list of lists: each element of each list
+    becomes an element of a single 1-D list."""
+    return [x for L0 in LL for x in L0]
 
 
 def normalize_vector(vector):
@@ -95,55 +45,15 @@ def get_direction_vector(direction, somatodendritic_axis):
     if direction['Coord_type'] == 'Cartesian':
         vector = normalize_vector([direction['X'], direction['Y'], direction['Z']])
     elif direction['Coord_type'] == 'Spherical':
-        vector = rotate_coords_from_axis(somatodendritic_axis, norm_spherical_to_cartesian(direction['Polar'], direction['Azimuthal']))
+        vector = rotate_coords_from_pos_z_to_axis(somatodendritic_axis, norm_spherical_to_cartesian(direction['Polar'], direction['Azimuthal']))
     else:
         raise ValueError('Direction must have a defined Coord_type of "Cartesian" or "Spherical"')
     return np.array(vector)
 
 
-def get_section_list_NetPyNE(NetPyNE_cell):
-    soma = NetPyNE_cell.secs["soma_0"]["hObj"]
-    return soma.wholetree()
-
-
-# From tmseffects/tms_networks/core/codes/list_routines.py
-def flattenLL(LL):
-    """Flattens a list of lists: each element of each list
-    becomes an element of a single 1-D list."""
-    return [x for L0 in LL for x in L0]
-
-
-def plot_quasipotentials(quasipotentials, centers):
-    from mpl_toolkits.mplot3d import Axes3D 
-    import matplotlib.pyplot as plt 
-    
-    quasipotentials = flattenLL(quasipotentials)
-    centers = flattenLL(centers)
-
-    xs = np.array([center[0] for center in centers])
-    ys = np.array([center[1] for center in centers])
-    zs = np.array([center[2] for center in centers])
-
-    ax = plt.figure().add_subplot(projection='3d')
-
-    scatter = ax.scatter(xs, zs, ys, c=quasipotentials, cmap='bwr') 
-    ax.set_aspect('equal')
-    ax.set_title("Cell Quasipotentials\n(Field points from positive to negative potential)") 
-    ax.set_xlabel('x-axis') 
-    ax.set_ylabel('z-axis') 
-    ax.set_zlabel('y-axis') 
-    ax.invert_yaxis()
-    cbar = plt.colorbar(scatter)
-    cbar.ax.set_ylabel('Quasipotentials (mV)')
-
-    # scatter = ax.scatter(xs, ys, zs, c=quasipotentials, cmap='bwr') 
-    # ax.set_aspect('equal')
-    # ax.set_title("Cell Quasipotentials\n(Field points from positive to negative potential)") 
-    # ax.set_xlabel('x-axis') 
-    # ax.set_ylabel('y-axis') 
-    # ax.set_zlabel('z-axis') 
-    # cbar = plt.colorbar(scatter)
-    # cbar.ax.set_ylabel('Quasipotentials (mV)')
+def get_section_list_NetPyNE(cell):
+    # Get section_list from cell assuming the cell is a NetPyNE CompartCell
+    return cell.secs["soma_0"]["hObj"].wholetree()
 
 
 def calculate_segments_centers(section_list):
@@ -197,225 +107,261 @@ def calculate_segments_centers(section_list):
 
         segments_centers.append(np.array(section_seg_centers))
 
-    # returns centers grouped by section.
+    # centers grouped by section.
     return np.array(segments_centers, dtype=object)
 
 
-def calculate_cell_quasipotentials(E_vectors, centers, section_list):
-    """
-    Calculate quasipotentials by numerical integration of a given
-    eletric field's values,
-    following the order of segments given by 'self.section_list'.
+class StimCell():
+    def __init__(self, cell: CompartCell):
+        self.cell = cell
+        self.section_list = []
+        self.segments_centers = []
+        self.E_vectors = []
+        self.norm_quasipotentials = []
+        self.extracellular_quasipotentials = []
 
-    Reference: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6035313/
-    """
+class ExtracellularStim():
+    def __init__(self,
+                 cells_list: list[CompartCell], 
+                 stim_type: str,
+                 decay_rate_percent_per_mm: float,
+                 E_field_dir: dict | list[dict],
+                 decay_dir: dict,
+                 somatodendritic_axis: list[float],
+                 ref_point_um: list[float] = [0, 0, 0],
+                 **waveform_params,):
 
-    segment_index = 0
-    quasipotentials = []  # list of lists
-    sec_names = []
+        self.cells_list = [StimCell(cell) for cell in cells_list]
+        self.stim_cell = None
+        self.stim_type = stim_type
+        self.decay_rate_percent_per_mm = decay_rate_percent_per_mm
+        self.E_field_dir = E_field_dir
+        self.decay_dir = decay_dir
+        self.somatodendritic_axis = somatodendritic_axis
+        self.ref_point_um = np.array(ref_point_um, dtype=float)
 
-    for sec in section_list:
-        segment_in_section_index = 0
-        section_quasipotentials = []
-        for seg in sec:
-            # if the segment is the root segment (first segment of soma):
-            if segment_index == 0:
-                section_quasipotentials.append(0.0)  # phi_soma = 0
+        self.wav, self.time, self.interval_func = get_efield(
+                stim_type=self.stim_type,
+                **waveform_params,
+            )
+
+    def set_stimulation(self, stim_cell: StimCell | None = None):
+        if stim_cell == None:
+            stim_cell = self.cells_list[0]
+        self.stim_cell = stim_cell
+        # Populate section_list in order of parent-child structure (depth-first)
+        self.stim_cell.section_list = get_section_list_NetPyNE(self.stim_cell.cell)
+
+        for sec in self.stim_cell.section_list:
+            # Set extracellular mechanism on all sections
+            sec.insert("extracellular")
+
+        self.set_E_field()  # Stores a list of normalized quasipotentials corresponding to each segment in the cell
+
+        # insert extracellular potentials
+        self.insert_extracellular_quasipotentials()
+
+
+    def set_E_field(self):
+        """
+        Sets electric field vectors defining the stimulus over this cell,
+        and calculates normalized quasipotentials (i.e., electric potential under
+        the quasistatic assumption of a normalized electric field).
+        """
+        self.stim_cell.segments_centers = calculate_segments_centers(self.stim_cell.section_list)
+        self.calculate_E_vectors()
+        self.calculate_norm_quasipotentials()
+    
+
+    def calculate_E_vectors(self):
+        # Get direction vectors in normalized cartesian coordinates
+        E_field_dir_vector = get_direction_vector(self.E_field_dir, self.somatodendritic_axis)
+        decay_dir_vector = get_direction_vector(self.decay_dir, self.somatodendritic_axis)
+
+        # Construct E_vectors with the same section & segment structure as segments_centers
+        # such that E_vector is scaled according to the field experienced at each center
+        self.stim_cell.E_vectors = []
+        for sec_segs in self.stim_cell.segments_centers: # Separate into lists of segments grouped by section
+            sec_ef = [] # List of electric field vectors at each segment in the section
+            for seg_center in sec_segs:
+                ext_field_scalar = (1 - self.decay_rate_percent_per_mm/100) ** np.dot(
+                    (np.array(seg_center) - self.ref_point_um) * um / mm, # Convert from um to mm because decay rate is defined in mm
+                    decay_dir_vector
+                )
+                sec_ef.append(E_field_dir_vector * ext_field_scalar)
+            self.stim_cell.E_vectors.append(sec_ef)
+
+
+    def calculate_norm_quasipotentials(self):
+        """
+        Calculate quasipotentials by numerical integration of a given
+        eletric field's values,
+        following the order of segments given by 'self.section_list'.
+
+        Reference: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6035313/
+        """
+        # quasipotentials are calculated using the E-field at each segment's center.
+
+        segment_index = 0
+        norm_quasipotentials = []  # Normalized quasipotentials; list of lists
+        sec_names = []
+
+        for sec in self.stim_cell.section_list:
+            segment_in_section_index = 0
+            section_norm_quasipotentials = []
+            for seg in sec:
+                # if the segment is the root segment (first segment of soma):
+                if segment_index == 0:
+                    section_norm_quasipotentials.append(0.0)  # phi_soma = 0
+                    segment_in_section_index += 1
+                    segment_index += 1
+                    continue
+                # if the segment is the first of the section:
+                elif segment_in_section_index == 0:
+                    # get previous section's id, for use as
+                    # index with E_field and centers
+                    previous_sec_name = sec.parentseg().sec.name()
+                    previous_sec_id = sec_names.index(previous_sec_name)
+
+                    # displacement vector
+                    seg_disp = (
+                        self.stim_cell.segments_centers[len(sec_names)][segment_in_section_index]
+                        - self.stim_cell.segments_centers[previous_sec_id][-1]
+                    )  # Center of current segment - center of last segment of previous section (displacement)
+                    E_p = self.stim_cell.E_vectors[previous_sec_id][
+                        -1
+                    ]  # Normalized E-field at last segment of previous section
+
+                    # get the normalized quasipotential of the
+                    # previous section's last segment.
+                    phi_p = norm_quasipotentials[previous_sec_id][
+                        -1
+                    ]  # Quasipotential at last segment of previous section
+                # if the segment is other than the first of the section:
+                else:
+                    seg_disp = (
+                        self.stim_cell.segments_centers[len(sec_names)][segment_in_section_index]
+                        - self.stim_cell.segments_centers[len(sec_names)][segment_in_section_index - 1]
+                    )
+                    E_p = self.stim_cell.E_vectors[len(sec_names)][segment_in_section_index - 1]
+
+                    phi_p = section_norm_quasipotentials[-1]
+
+                E_c = self.stim_cell.E_vectors[len(sec_names)][
+                    segment_in_section_index
+                ]  # Normalized E-field at current segment
+
+                # Normalized quasipotential of current segment
+                phi_c = phi_p - 0.5 * np.dot((E_c + E_p), seg_disp)
+
+                section_norm_quasipotentials.append(phi_c)
+
                 segment_in_section_index += 1
                 segment_index += 1
-                continue
-            # if the segment is the first of the section:
-            elif segment_in_section_index == 0:
-                # get previous section's id, for use as
-                # index with E_field and centers
-                previous_sec_name = sec.parentseg().sec.name()
-                previous_sec_id = sec_names.index(previous_sec_name)
 
-                # displacement vector
-                seg_disp = (
-                    centers[len(sec_names)][segment_in_section_index]
-                    - centers[previous_sec_id][-1]
-                )  # Center of current segment - center of last segment of previous section (displacement)
-                E_p = E_vectors[previous_sec_id][
-                    -1
-                ]  # Normalized E-field at last segment of previous section
+            sec_names.append(sec.name())
+            norm_quasipotentials.append(section_norm_quasipotentials)
 
-                # get the quasipotential of the
-                # previous section's last segment.
-                phi_p = quasipotentials[previous_sec_id][
-                    -1
-                ]  # Quasipotential at last segment of previous section
-            # if the segment is other than the first of the section:
-            else:
-                seg_disp = (
-                    centers[len(sec_names)][segment_in_section_index]
-                    - centers[len(sec_names)][segment_in_section_index - 1]
+        self.stim_cell.norm_quasipotentials = norm_quasipotentials  # Important: E-field Normalized - varaible technically has units of um; scaling will occur in build_v_ext()
+    
+
+    # From tmseffects/tms_networks/core/codes/LFPyCell.py/insert_v_ext()
+    def insert_extracellular_quasipotentials(self):
+        """Set external extracellular potential around cell.
+
+        Playback of some extracellular potential v_ext on each cell.totnseg
+        compartments. Assumes that the "extracellular"-mechanism is inserted
+        on each compartment.
+        Can be used to study ephaptic effects and similar
+        The inputs will be copied and attached to the cell object as
+        cell.v_ext, cell.t_ext, and converted
+        to (list of) neuron.h.Vector types, to allow playback into each
+        compartment e_extracellular reference.
+        Can not be deleted prior to running cell.simulate()
+
+        Parameters
+        ----------
+        v_ext : ndarray
+            Numpy array of size cell.totnsegs x t_ext.size, unit mV
+        t_ext : ndarray
+            Time vector of v_ext
+        """
+
+        # generate v_ext matrix
+        self.calculate_extracellular_quasipotentials()
+
+        # create list of extracellular potentials on each segment, time vector
+        self.stim_cell.cell.t_ext = h.Vector(np.array(self.time))
+        self.stim_cell.cell.v_ext = []
+        for v in self.stim_cell.extracellular_quasipotentials:
+            self.stim_cell.cell.v_ext.append(h.Vector(v))
+
+        # play v_ext into e_extracellular reference
+        i = 0
+        for sec in self.stim_cell.section_list:  # v
+            for seg in sec:
+                self.stim_cell.cell.v_ext[i].play(seg._ref_e_extracellular, self.stim_cell.cell.t_ext, True)
+                i += 1
+
+
+    # From tmseffects/tms_networks/core/TMSSimulation.py/build_v_ext()
+    def calculate_extracellular_quasipotentials(self):
+        norm_quasipotentials_list = flattenLL(self.stim_cell.norm_quasipotentials)
+        v_ext = np.zeros((len(norm_quasipotentials_list), len(self.wav)))
+
+        for i in range(len(norm_quasipotentials_list)):
+            # norm_quasipotentials_list contains normalized quasipotentials for each segment (units um)
+            # self.wav contains E-field values over time (units mV/um) to scale the normalized quasipotentials
+            v_ext[i, :] = [norm_quasipotentials_list[i] * vt for vt in self.wav]  # mV
+
+        self.stim_cell.extracellular_quasipotentials = v_ext
+
+
+    def clear_stim_data(self):
+        # Sometimes necessary to clear this clutter from memory
+        for item in [self.cells_list, self.stim_cell, self.stim_type, self.decay_rate_percent_per_mm, self.E_field_dir, 
+                     self.decay_dir, self.somatodendritic_axis, self.ref_point_um, self.wav, self.time]:
+            del item
+
+
+class SingleExtracellular(ExtracellularStim):
+    def __init__(self, cell, stim_type, decay_rate_percent_per_mm, E_field_dir, decay_dir, somatodendritic_axis, ref_point_um = [0, 0, 0], **waveform_params):
+        super().__init__([cell], stim_type, decay_rate_percent_per_mm, E_field_dir, decay_dir, somatodendritic_axis, ref_point_um, **waveform_params)
+        from netpyne import sim
+        if sim.rank == 0:
+            print(f"Applying extracellular stim ({stim_type}) to network...")
+        
+        self.set_stimulation()
+        self.netcons = []
+        self.action_potentials = h.Vector()
+        self.action_potentials_recording_ids = h.Vector()
+
+
+    # From tmsneurosim/nrn/simulation/simulation.py/Simulation._init_spike_recording()
+    def init_spike_recording(self):
+        """Initializes spike recording for every segment of the neuron."""
+        self.netcons = []
+        for i, section in enumerate(self.stim_cell.section_list):
+            for segment in section:
+                recording_netcon = h.NetCon(segment._ref_v, None, sec=section)
+                recording_netcon.threshold = 0
+                recording_netcon.record(
+                    self.action_potentials, self.action_potentials_recording_ids, i
                 )
-                E_p = E_vectors[len(sec_names)][segment_in_section_index - 1]
-
-                phi_p = section_quasipotentials[-1]
-
-            E_c = E_vectors[len(sec_names)][
-                segment_in_section_index
-            ]  # Normalized E-field at current segment
-
-            # converts from micrometers to milimeters, so that E-field
-            # of unit mV/mm (which is equivalent to V/m) can be used.
-            # NOTE: NEURON simulation uses um, so this should not be changed
-            # seg_disp = seg_disp * 1e-3
-
-            # NOTE: CALCULATION OF NORMALIZED QUASIPOTENTIAL; any non-logic errors stem from this calculation or that of its component variables
-            # Due to normalized E-field vectors, the quasipotential
-            phi_c = phi_p - 0.5 * np.dot((E_c + E_p), seg_disp)
-
-            section_quasipotentials.append(phi_c)
-
-            segment_in_section_index += 1
-            segment_index += 1
-
-        assert len(list(sec)) == len(section_quasipotentials)  # debug
-
-        sec_names.append(sec.name())
-        quasipotentials.append(section_quasipotentials)
-
-    return quasipotentials  # Important: E-field Normalized - varaible technically has units of um; scaling will occur in build_v_ext()
-
-
-def set_E_field(
-        section_list: list,
-        decay_rate_percent_per_mm: float,
-        E_field_dir: dict,
-        decay_dir: dict,
-        ref_point_um: list[float],
-        somatodendritic_axis: list[float],
-        plot: bool,
-    ):
-    """
-    Sets electric field vectors defining the stimulus over this cell,
-    and calculates quasipotentials (i.e., electric potential under
-    the quasistatic assumption).
-    """
-
-    E_field_dir_vector = get_direction_vector(E_field_dir, somatodendritic_axis)
-    decay_dir_vector = get_direction_vector(decay_dir, somatodendritic_axis)
-    ref_point_um = np.array(ref_point_um, dtype=float)
-
-    segments_centers = calculate_segments_centers(section_list)
-
-    # Construct E_vectors with the same section & segment structure as segments_centers
-    # such that E_vector is scaled according to the field experienced at each center
-    E_vectors = []
-    for sec_segs in segments_centers:
-        sec_ef = [] # List of electric field vectors at each segment in the section
-        for seg_center in sec_segs:
-            ext_field_scalar = (1 - decay_rate_percent_per_mm/100) ** np.dot(
-                (np.array(seg_center) - ref_point_um) * um / mm, # Convert from um to mm because decay rate is defined in mm
-                decay_dir_vector
-            )
-            sec_ef.append(E_field_dir_vector * ext_field_scalar)
-        E_vectors.append(sec_ef)
-
-    # check
-    for i in range(len(E_vectors)):
-        assert len(E_vectors[i]) == len(segments_centers[i])
-
-    # quasipotentials are calculated using the E-field at each segment's center.
-    quasipotentials = calculate_cell_quasipotentials(
-        E_vectors, segments_centers, section_list
-    )
-
-    if plot:
-        plot_quasipotentials(quasipotentials, segments_centers)
-
-    # values of electric potential at segments centers, but flattened,
-    # i.e., not grouped by sections.
-    # (in 'self.quasipotentials', they are grouped by section.)
-    return np.array(flattenLL(quasipotentials))
-
-
-def set_stimulation(
-        cell: CompartCell, 
-        decay_rate_percent_per_mm: float,
-        E_field_dir: dict,
-        decay_dir: dict,
-        ref_point_um: list[float],
-        somatodendritic_axis: list[float],
-        plot: bool,
-        wav: list,
-        time: list,
-    ):
-
-
-    # Populate section_list in order of parent-child structure (depth-first)
-    section_list = get_section_list_NetPyNE(cell)
-
-    for sec in section_list:
-        # Set extracellular mechanism on all sections
-        sec.insert("extracellular")
-
-    v_segments = set_E_field(
-        section_list=section_list,
-        decay_rate_percent_per_mm=decay_rate_percent_per_mm,
-        E_field_dir=E_field_dir,
-        decay_dir=decay_dir,
-        ref_point_um=ref_point_um,
-        somatodendritic_axis=somatodendritic_axis,
-        plot=plot,
-    )  # Returns a list of quasipotentials corresponding to each segment in the cell
-
-    # generate v_ext matrix
-    v_ext = build_v_ext(v_segments, wav)
-    t_ext = np.array(time)
-
-    # insert extracellular potentials
-    insert_v_ext(cell, np.array(v_ext), np.array(t_ext), section_list)
-
-    return v_segments
-
-def apply_extracellular_stim(
-        cells_list: list, 
-        stim_type: str,
-        decay_rate_percent_per_mm: float,
-        E_field_dir: dict,
-        decay_dir: dict,
-        somatodendritic_axis: list[float],
-        ref_point_um: list[float] = [0, 0, 0],
-        plot: bool = False,
-        **waveform_params,
-    ):
-    """
-    net: NetPyNE network object
-    freq_Hz: Frequency of TMS pulses in Hz
-    duration_ms: Duration of simulation in ms
-    pulse_resolution_ms: Temporal resolution of pulses in ms (independent of simulation dt)
-    stim_start_ms: Time of first pulse in ms
-    stim_end_ms: Time when stimulation ends in ms
-    ef_amp_V_per_m: Amplitude of pulse in V/m
-    width_ms: Period of waveform in ms
-    pshape: Qualitative description of waveform ("Sine" and "Square" are the only currently supported options)
-    decay_rate_percent_per_mm: Rate of exponential decay of electric field in %(V/m)/mm; Valid for (1, 0] (exclusive, inclusive bounds)
-    E_field_dir: Direction of electric field; vector does not need to be normalized
-    decay_dir: Direction along which the decay of the electric field occurs; vector does not need to be normalized
-    ref_point_um: Point in um at which the E-field magnitude = specified amplitude (technically defines a plane normal to decay_dir intersecting this point)
-    """
-    print(f"Applying extracellular stim ({stim_type}) to network...")
-
-    wav, time, interval_func = get_efield(
-            stim_type=stim_type,
-            **waveform_params,
-        )
+                self.netcons.append(recording_netcon)
     
-    for cell in cells_list:
-        set_stimulation(
-            cell, 
-            decay_rate_percent_per_mm,
-            E_field_dir,
-            decay_dir,
-            ref_point_um,
-            somatodendritic_axis,
-            plot,
-            wav, 
-            time,
-        )
-    
-    return interval_func
+    def clear_spike_data(self):
+        # Sometimes necessary to clear this clutter from memory
+        for item in [self.netcons, self.action_potentials, self.action_potentials_recording_ids]:
+            del item
+
+
+class MultiExtracellular(ExtracellularStim):
+    def __init__(self, cells_list, stim_type, decay_rate_percent_per_mm, E_field_dir, decay_dir, somatodendritic_axis, ref_point_um = [0, 0, 0], **waveform_params):
+        super().__init__(cells_list, stim_type, decay_rate_percent_per_mm, E_field_dir, decay_dir, somatodendritic_axis, ref_point_um, **waveform_params)
+        from netpyne import sim
+        if sim.rank == 0:
+            print(f"Applying extracellular stim ({stim_type}) to network...")
+            
+        for stim_cell in self.cells_list:
+            self.set_stimulation(stim_cell)

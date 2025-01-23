@@ -9,7 +9,7 @@ def get_angles(polar_resolution, azimuthal_resolution):
         num_azimuthal_angles = get_num_azimuthal_angles(polar_angle, azimuthal_resolution)
         azimuthal_angles = np.linspace(0, 360, num_azimuthal_angles, endpoint=False).tolist()
         angles.append([polar_angle, azimuthal_angles])
-    return angles
+    return angles, unpack_angles(angles)
 
 def get_num_azimuthal_angles(polar_angle, azimuthal_resolution):
     num_azimuthal_angles = ceil(round(360*sin(radians(polar_angle))/azimuthal_resolution, 9))

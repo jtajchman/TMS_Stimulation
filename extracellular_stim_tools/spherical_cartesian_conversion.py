@@ -5,6 +5,14 @@ import math
 import numpy as np
 
 
+def normalize(x, y, z):
+    r = np.sqrt(x**2 + y**2 + z**2)
+    if r != 0:
+        return x / r, y / r, z / r
+    else:
+        return x, y, z
+
+
 def cartesian_to_spherical(x, y, z):
     """
     Calculates spherical coordinates from cartesian coordinates.
@@ -38,6 +46,7 @@ def norm_cartesian_to_spherical(x, y, z):
     :param z: The z coordinate
     :return: The azimuthal angle, the polar angle and the length.
     """
+    x, y, z = normalize(x, y, z)
     if x > 0 and y > 0:
         phi = np.arctan(np.fabs(y / x))
     elif x > 0 and y < 0:

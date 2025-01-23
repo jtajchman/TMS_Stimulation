@@ -101,7 +101,6 @@ extern "C" {
  static Datum* _extcall_thread;
  static Prop* _extcall_prop;
  /* external NEURON variables */
- extern double celsius;
  /* declaration of user functions */
  static void _hoc_rates(void);
  static int _mechtype;
@@ -283,7 +282,7 @@ static int _ode_spec1(_threadargsproto_);
  
 static int  rates ( _threadargsproto_ ) {
    double _lqt ;
- _lqt = pow( 2.3 , ( ( celsius - 21.0 ) / 10.0 ) ) ;
+ _lqt = pow( 2.3 , ( ( 34.0 - 21.0 ) / 10.0 ) ) ;
     if ( v  == - 38.0 ) {
      v = v + 0.0001 ;
      }
@@ -522,7 +521,7 @@ static const char* nmodl_file_text =
   "NEURON	{\n"
   "	SUFFIX NaTa_t\n"
   "	USEION na READ ena WRITE ina\n"
-  "	RANGE gNaTa_tbar, gNaTa_t, ina, mtau_scale, htau_scale\n"
+  "	RANGE gNaTa_tbar, gNaTa_t, ina\n"
   "}\n"
   "\n"
   "UNITS	{\n"
@@ -532,7 +531,7 @@ static const char* nmodl_file_text =
   "}\n"
   "\n"
   "PARAMETER	{\n"
-  "	gNaTa_tbar = 0.00001 (S/cm2)	\n"
+  "	gNaTa_tbar = 0.00001 (S/cm2)\n"
   "}\n"
   "\n"
   "ASSIGNED	{\n"
@@ -575,8 +574,8 @@ static const char* nmodl_file_text =
   "\n"
   "PROCEDURE rates(){\n"
   "  LOCAL qt\n"
-  "  :qt = 2.3^((34-21)/10)\n"
-  "  qt = 2.3^((celsius-21)/10)\n"
+  "  qt = 2.3^((34-21)/10)\n"
+  "	\n"
   "  UNITSOFF\n"
   "    if(v == -38){\n"
   "    	v = v+0.0001\n"

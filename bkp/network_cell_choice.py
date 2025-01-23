@@ -27,6 +27,6 @@ cell_types = [
 ]
 if reduced:
     allpops = ["L5_P"]
-    cell_types = ["L5_TTPC2"]
+    cell_types = ["L5_TTPC2_cADpyr"]
     cell_choice = cell_types
 pop_to_cell = {pop: cell for pop, cell in zip(allpops, cell_types)}

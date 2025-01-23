@@ -19,7 +19,7 @@ for cellName in cell_choice:
         somaAtOrigin=False,
         conds={"cellType": cellName, "cellModel": "HH_full"},
         fileName="cellwrapper3.py",
-        cellName="loadCell_Net_adv",
+        cellName="loadCell_tmsneurosim",
         cellInstance=True,
         cellArgs={"cellName": cellName, "id": cell_id},
     )
@@ -40,11 +40,11 @@ for cellName in cell_choice:
     for sec in cellSecs.values():
         # sec["mechs"]["extracellular"] = {}
         del sec.mechs.xtra
-        # if sec["geom"]["diam"] > 10:
-        #     sec["geom"]["diam"] = 1.0
-        #     sec["geom"]["pt3d"] = [
-        #         (pt[0], pt[1], pt[2], 1.0) for pt in sec["geom"]["pt3d"]
-        #     ]
+        if sec["geom"]["diam"] > 10:
+            sec["geom"]["diam"] = 1.0
+            sec["geom"]["pt3d"] = [
+                (pt[0], pt[1], pt[2], 1.0) for pt in sec["geom"]["pt3d"]
+            ]
 
     print(
         f"Axon sections ({cellName}): "

@@ -45,84 +45,86 @@ extern double hoc_Exp(double);
  
 #define t _nt->_t
 #define dt _nt->_dt
-#define tau_r_AMPA _p[0]
-#define tau_r_AMPA_columnindex 0
-#define tau_d_AMPA _p[1]
-#define tau_d_AMPA_columnindex 1
-#define tau_r_NMDA _p[2]
-#define tau_r_NMDA_columnindex 2
-#define tau_d_NMDA _p[3]
-#define tau_d_NMDA_columnindex 3
-#define Use _p[4]
-#define Use_columnindex 4
-#define Dep _p[5]
-#define Dep_columnindex 5
-#define Fac _p[6]
-#define Fac_columnindex 6
-#define e _p[7]
-#define e_columnindex 7
-#define mg _p[8]
-#define mg_columnindex 8
-#define u0 _p[9]
-#define u0_columnindex 9
-#define synapseID _p[10]
-#define synapseID_columnindex 10
-#define verboseLevel _p[11]
-#define verboseLevel_columnindex 11
-#define NMDA_ratio _p[12]
-#define NMDA_ratio_columnindex 12
-#define i _p[13]
-#define i_columnindex 13
-#define i_AMPA _p[14]
-#define i_AMPA_columnindex 14
-#define i_NMDA _p[15]
-#define i_NMDA_columnindex 15
-#define g_AMPA _p[16]
-#define g_AMPA_columnindex 16
-#define g_NMDA _p[17]
-#define g_NMDA_columnindex 17
-#define g _p[18]
-#define g_columnindex 18
-#define A_AMPA_step _p[19]
-#define A_AMPA_step_columnindex 19
-#define B_AMPA_step _p[20]
-#define B_AMPA_step_columnindex 20
-#define A_NMDA_step _p[21]
-#define A_NMDA_step_columnindex 21
-#define B_NMDA_step _p[22]
-#define B_NMDA_step_columnindex 22
-#define Rstate _p[23]
-#define Rstate_columnindex 23
-#define tsyn_fac _p[24]
-#define tsyn_fac_columnindex 24
-#define u _p[25]
-#define u_columnindex 25
-#define A_AMPA _p[26]
-#define A_AMPA_columnindex 26
-#define B_AMPA _p[27]
-#define B_AMPA_columnindex 27
-#define A_NMDA _p[28]
-#define A_NMDA_columnindex 28
-#define B_NMDA _p[29]
-#define B_NMDA_columnindex 29
-#define factor_AMPA _p[30]
-#define factor_AMPA_columnindex 30
-#define factor_NMDA _p[31]
-#define factor_NMDA_columnindex 31
-#define DA_AMPA _p[32]
-#define DA_AMPA_columnindex 32
-#define DB_AMPA _p[33]
-#define DB_AMPA_columnindex 33
-#define DA_NMDA _p[34]
-#define DA_NMDA_columnindex 34
-#define DB_NMDA _p[35]
-#define DB_NMDA_columnindex 35
-#define v _p[36]
-#define v_columnindex 36
-#define _g _p[37]
-#define _g_columnindex 37
-#define _tsav _p[38]
-#define _tsav_columnindex 38
+#define tau_d_AMPA _p[0]
+#define tau_d_AMPA_columnindex 0
+#define Use _p[1]
+#define Use_columnindex 1
+#define Dep _p[2]
+#define Dep_columnindex 2
+#define Fac _p[3]
+#define Fac_columnindex 3
+#define mg _p[4]
+#define mg_columnindex 4
+#define u0 _p[5]
+#define u0_columnindex 5
+#define Nrrp _p[6]
+#define Nrrp_columnindex 6
+#define synapseID _p[7]
+#define synapseID_columnindex 7
+#define verboseLevel _p[8]
+#define verboseLevel_columnindex 8
+#define selected_for_report _p[9]
+#define selected_for_report_columnindex 9
+#define NMDA_ratio _p[10]
+#define NMDA_ratio_columnindex 10
+#define i _p[11]
+#define i_columnindex 11
+#define i_AMPA _p[12]
+#define i_AMPA_columnindex 12
+#define i_NMDA _p[13]
+#define i_NMDA_columnindex 13
+#define g_AMPA _p[14]
+#define g_AMPA_columnindex 14
+#define g_NMDA _p[15]
+#define g_NMDA_columnindex 15
+#define g _p[16]
+#define g_columnindex 16
+#define A_AMPA_step _p[17]
+#define A_AMPA_step_columnindex 17
+#define B_AMPA_step _p[18]
+#define B_AMPA_step_columnindex 18
+#define A_NMDA_step _p[19]
+#define A_NMDA_step_columnindex 19
+#define B_NMDA_step _p[20]
+#define B_NMDA_step_columnindex 20
+#define unoccupied _p[21]
+#define unoccupied_columnindex 21
+#define occupied _p[22]
+#define occupied_columnindex 22
+#define tsyn _p[23]
+#define tsyn_columnindex 23
+#define u _p[24]
+#define u_columnindex 24
+#define A_AMPA _p[25]
+#define A_AMPA_columnindex 25
+#define B_AMPA _p[26]
+#define B_AMPA_columnindex 26
+#define A_NMDA _p[27]
+#define A_NMDA_columnindex 27
+#define B_NMDA _p[28]
+#define B_NMDA_columnindex 28
+#define factor_AMPA _p[29]
+#define factor_AMPA_columnindex 29
+#define factor_NMDA _p[30]
+#define factor_NMDA_columnindex 30
+#define mggate _p[31]
+#define mggate_columnindex 31
+#define usingR123 _p[32]
+#define usingR123_columnindex 32
+#define DA_AMPA _p[33]
+#define DA_AMPA_columnindex 33
+#define DB_AMPA _p[34]
+#define DB_AMPA_columnindex 34
+#define DA_NMDA _p[35]
+#define DA_NMDA_columnindex 35
+#define DB_NMDA _p[36]
+#define DB_NMDA_columnindex 36
+#define v _p[37]
+#define v_columnindex 37
+#define _g _p[38]
+#define _g_columnindex 38
+#define _tsav _p[39]
+#define _tsav_columnindex 39
 #define _nd_area  *_ppvar[0]._pval
 #define rng	*_ppvar[2]._pval
 #define _p_rng	_ppvar[2]._pval
@@ -144,6 +146,7 @@ extern "C" {
  static Prop* _extcall_prop;
  /* external NEURON variables */
  /* declaration of user functions */
+ static double _hoc_bbsavestate(void*);
  static double _hoc_setRNG(void*);
  static double _hoc_state(void*);
  static double _hoc_toggleVerbose(void*);
@@ -195,39 +198,46 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  "loc", _hoc_loc_pnt,
  "has_loc", _hoc_has_loc,
  "get_loc", _hoc_get_loc_pnt,
+ "bbsavestate", _hoc_bbsavestate,
  "setRNG", _hoc_setRNG,
  "state", _hoc_state,
  "toggleVerbose", _hoc_toggleVerbose,
  "urand", _hoc_urand,
  0, 0
 };
+#define bbsavestate bbsavestate_ProbAMPANMDA_EMS
 #define toggleVerbose toggleVerbose_ProbAMPANMDA_EMS
 #define urand urand_ProbAMPANMDA_EMS
+ extern double bbsavestate( _threadargsproto_ );
  extern double toggleVerbose( _threadargsproto_ );
  extern double urand( _threadargsproto_ );
  /* declare global and static user variables */
- static int _thread1data_inuse = 0;
-static double _thread1data[1];
-#define _gth 0
+#define e e_ProbAMPANMDA_EMS
+ double e = 0;
 #define gmax gmax_ProbAMPANMDA_EMS
  double gmax = 0.001;
-#define mggate_ProbAMPANMDA_EMS _thread1data[0]
-#define mggate _thread[_gth]._pval[0]
+#define tau_d_NMDA tau_d_NMDA_ProbAMPANMDA_EMS
+ double tau_d_NMDA = 43;
+#define tau_r_NMDA tau_r_NMDA_ProbAMPANMDA_EMS
+ double tau_r_NMDA = 0.29;
+#define tau_r_AMPA tau_r_AMPA_ProbAMPANMDA_EMS
+ double tau_r_AMPA = 0.2;
  /* some parameters have upper and lower limits */
  static HocParmLimits _hoc_parm_limits[] = {
  0,0,0
 };
  static HocParmUnits _hoc_parm_units[] = {
+ "tau_r_AMPA_ProbAMPANMDA_EMS", "ms",
+ "tau_r_NMDA_ProbAMPANMDA_EMS", "ms",
+ "tau_d_NMDA_ProbAMPANMDA_EMS", "ms",
+ "e_ProbAMPANMDA_EMS", "mV",
  "gmax_ProbAMPANMDA_EMS", "uS",
- "tau_r_AMPA", "ms",
  "tau_d_AMPA", "ms",
- "tau_r_NMDA", "ms",
- "tau_d_NMDA", "ms",
  "Use", "1",
  "Dep", "ms",
  "Fac", "ms",
- "e", "mV",
  "mg", "mM",
+ "Nrrp", "1",
  "NMDA_ratio", "1",
  "i", "nA",
  "i_AMPA", "nA",
@@ -235,8 +245,9 @@ static double _thread1data[1];
  "g_AMPA", "uS",
  "g_NMDA", "uS",
  "g", "uS",
- "Rstate", "1",
- "tsyn_fac", "ms",
+ "unoccupied", "1",
+ "occupied", "1",
+ "tsyn", "ms",
  "u", "1",
  0,0
 };
@@ -247,7 +258,10 @@ static double _thread1data[1];
  static double delta_t = 0.01;
  /* connect global user variables to hoc */
  static DoubScal hoc_scdoub[] = {
- "mggate_ProbAMPANMDA_EMS", &mggate_ProbAMPANMDA_EMS,
+ "tau_r_AMPA_ProbAMPANMDA_EMS", &tau_r_AMPA_ProbAMPANMDA_EMS,
+ "tau_r_NMDA_ProbAMPANMDA_EMS", &tau_r_NMDA_ProbAMPANMDA_EMS,
+ "tau_d_NMDA_ProbAMPANMDA_EMS", &tau_d_NMDA_ProbAMPANMDA_EMS,
+ "e_ProbAMPANMDA_EMS", &e_ProbAMPANMDA_EMS,
  "gmax_ProbAMPANMDA_EMS", &gmax_ProbAMPANMDA_EMS,
  0,0
 };
@@ -269,18 +283,16 @@ static int _ode_count(int);
  static const char *_mechanism[] = {
  "7.7.0",
 "ProbAMPANMDA_EMS",
- "tau_r_AMPA",
  "tau_d_AMPA",
- "tau_r_NMDA",
- "tau_d_NMDA",
  "Use",
  "Dep",
  "Fac",
- "e",
  "mg",
  "u0",
+ "Nrrp",
  "synapseID",
  "verboseLevel",
+ "selected_for_report",
  "NMDA_ratio",
  0,
  "i",
@@ -293,8 +305,9 @@ static int _ode_count(int);
  "B_AMPA_step",
  "A_NMDA_step",
  "B_NMDA_step",
- "Rstate",
- "tsyn_fac",
+ "unoccupied",
+ "occupied",
+ "tsyn",
  "u",
  0,
  "A_AMPA",
@@ -315,24 +328,22 @@ static void nrn_alloc(Prop* _prop) {
 	_p = nrn_point_prop_->param;
 	_ppvar = nrn_point_prop_->dparam;
  }else{
- 	_p = nrn_prop_data_alloc(_mechtype, 39, _prop);
+ 	_p = nrn_prop_data_alloc(_mechtype, 40, _prop);
  	/*initialize range parameters*/
- 	tau_r_AMPA = 0.2;
  	tau_d_AMPA = 1.7;
- 	tau_r_NMDA = 0.29;
- 	tau_d_NMDA = 43;
  	Use = 1;
  	Dep = 100;
  	Fac = 10;
- 	e = 0;
  	mg = 1;
  	u0 = 0;
+ 	Nrrp = 1;
  	synapseID = 0;
  	verboseLevel = 0;
+ 	selected_for_report = 0;
  	NMDA_ratio = 0.71;
   }
  	_prop->param = _p;
- 	_prop->param_size = 39;
+ 	_prop->param_size = 40;
   if (!nrn_point_prop_) {
  	_ppvar = nrn_prop_datum_alloc(_mechtype, 3, _prop);
   }
@@ -343,8 +354,10 @@ static void nrn_alloc(Prop* _prop) {
  static void _initlists();
  static void _net_receive(Point_process*, double*, double);
  static void _net_init(Point_process*, double*, double);
- static void _thread_mem_init(Datum*);
- static void _thread_cleanup(Datum*);
+ static void bbcore_write(double*, int*, int*, int*, _threadargsproto_);
+ extern void hoc_reg_bbcore_write(int, void(*)(double*, int*, int*, int*, _threadargsproto_));
+ static void bbcore_read(double*, int*, int*, int*, _threadargsproto_);
+ extern void hoc_reg_bbcore_read(int, void(*)(double*, int*, int*, int*, _threadargsproto_));
  extern Symbol* hoc_lookup(const char*);
 extern void _nrn_thread_reg(int, int, void(*)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, NrnThread*, int));
@@ -356,34 +369,31 @@ extern void _cvode_abstol( Symbol**, double*, int);
   _initlists();
  	_pointtype = point_register_mech(_mechanism,
 	 nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init,
-	 hoc_nrnpointerindex, 2,
+	 hoc_nrnpointerindex, 1,
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
-  _extcall_thread = (Datum*)ecalloc(1, sizeof(Datum));
-  _thread_mem_init(_extcall_thread);
-  _thread1data_inuse = 0;
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
-     _nrn_thread_reg(_mechtype, 1, _thread_mem_init);
-     _nrn_thread_reg(_mechtype, 0, _thread_cleanup);
+   hoc_reg_bbcore_write(_mechtype, bbcore_write);
+   hoc_reg_bbcore_read(_mechtype, bbcore_read);
  #if NMODL_TEXT
   hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
   hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
 #endif
-  hoc_register_prop_size(_mechtype, 39, 3);
+  hoc_register_prop_size(_mechtype, 40, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
-  hoc_register_dparam_semantics(_mechtype, 2, "pointer");
+  hoc_register_dparam_semantics(_mechtype, 2, "bbcorepointer");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_init[_mechtype] = _net_init;
- pnt_receive_size[_mechtype] = 5;
+ pnt_receive_size[_mechtype] = 4;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
  	ivoc_help("help ?1 ProbAMPANMDA_EMS ProbAMPANMDA_EMS.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
 static int _reset;
-static char *modelname = "Probabilistic AMPA and NMDA receptor with presynaptic short-term plasticity ";
+static char *modelname = "Probabilistic AMPA and NMDA receptor with presynaptic short-term plasticity";
 
 static int error;
 static int _ninits = 0;
@@ -397,6 +407,7 @@ static int state(_threadargsproto_);
 #include<stdlib.h>
 #include<stdio.h>
 #include<math.h>
+#include "nrnran123.h"
 
 double nrn_random_pick(void* r);
 void* nrn_random_arg(int argpos);
@@ -426,16 +437,16 @@ static void _net_receive (Point_process* _pnt, double* _args, double _lflag)
    _thread = (Datum*)0; _nt = (NrnThread*)_pnt->_vnt;   _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
   if (_tsav > t){ extern char* hoc_object_name(); hoc_execerror(hoc_object_name(_pnt->ob), ":Event arrived out of order. Must call ParallelContext.set_maxstep AFTER assigning minimum NetCon.delay");}
  _tsav = t; {
-   double _lresult ;
+   double _lresult , _lves , _loccu ;
  _args[1] = _args[0] ;
    _args[2] = _args[0] * NMDA_ratio ;
-   if (  ! ( _args[0] > 0.0 ) ) {
+   if ( _args[0] <= 0.0  || t < 0.0 ) {
      
 /*VERBATIM*/
         return;
  }
    if ( Fac > 0.0 ) {
-     u = u * exp ( - ( t - tsyn_fac ) / Fac ) ;
+     u = u * exp ( - ( t - tsyn ) / Fac ) ;
      }
    else {
      u = Use ;
@@ -443,41 +454,40 @@ static void _net_receive (Point_process* _pnt, double* _args, double _lflag)
    if ( Fac > 0.0 ) {
      u = u + Use * ( 1.0 - u ) ;
      }
-   tsyn_fac = t ;
-   if ( Rstate  == 0.0 ) {
-     _args[3] = exp ( - ( t - _args[4] ) / Dep ) ;
+   {int  _lcounter ;for ( _lcounter = 0 ; _lcounter <= ( ((int) unoccupied ) - 1 ) ; _lcounter ++ ) {
+     _args[3] = exp ( - ( t - tsyn ) / Dep ) ;
      _lresult = urand ( _threadargs_ ) ;
      if ( _lresult > _args[3] ) {
-       Rstate = 1.0 ;
+       occupied = occupied + 1.0 ;
        if ( verboseLevel > 0.0 ) {
-         printf ( "Recovered! %f at time %g: Psurv = %g, urand=%g\n" , synapseID , t , _args[3] , _lresult ) ;
-         }
+          printf ( "Recovered! %f at time %g: Psurv = %g, urand=%g\n" , synapseID , t , _args[3] , _lresult ) ;
+          }
        }
-     else {
-       _args[4] = t ;
-       if ( verboseLevel > 0.0 ) {
-         printf ( "Failed to recover! %f at time %g: Psurv = %g, urand=%g\n" , synapseID , t , _args[3] , _lresult ) ;
-         }
-       }
-     }
-   if ( Rstate  == 1.0 ) {
+     } }
+   _lves = 0.0 ;
+   _loccu = occupied - 1.0 ;
+   {int  _lcounter ;for ( _lcounter = 0 ; _lcounter <= ((int) _loccu ) ; _lcounter ++ ) {
      _lresult = urand ( _threadargs_ ) ;
      if ( _lresult < u ) {
-       _args[4] = t ;
-       Rstate = 0.0 ;
-       A_AMPA = A_AMPA + _args[1] * factor_AMPA ;
-       B_AMPA = B_AMPA + _args[1] * factor_AMPA ;
-       A_NMDA = A_NMDA + _args[2] * factor_NMDA ;
-       B_NMDA = B_NMDA + _args[2] * factor_NMDA ;
-       if ( verboseLevel > 0.0 ) {
-         printf ( "Release! %f at time %g: vals %g %g %g %g\n" , synapseID , t , A_AMPA , _args[1] , factor_AMPA , _args[0] ) ;
-         }
+       occupied = occupied - 1.0 ;
+       _lves = _lves + 1.0 ;
        }
-     else {
-       if ( verboseLevel > 0.0 ) {
-         printf ( "Failure! %f at time %g: urand = %g\n" , synapseID , t , _lresult ) ;
-         }
-       }
+     } }
+   unoccupied = Nrrp - occupied ;
+   tsyn = t ;
+   if ( _lves > 0.0 ) {
+     A_AMPA = A_AMPA + _lves / Nrrp * _args[1] * factor_AMPA ;
+     B_AMPA = B_AMPA + _lves / Nrrp * _args[1] * factor_AMPA ;
+     A_NMDA = A_NMDA + _lves / Nrrp * _args[2] * factor_NMDA ;
+     B_NMDA = B_NMDA + _lves / Nrrp * _args[2] * factor_NMDA ;
+     if ( verboseLevel > 0.0 ) {
+        printf ( "Release! %f at time %g: vals %g %g %g %g\n" , synapseID , t , A_AMPA , _args[1] , factor_AMPA , _args[0] ) ;
+        }
+     }
+   else {
+     if ( verboseLevel > 0.0 ) {
+        printf ( " || SYN_ID: %f, release failure || " , synapseID ) ;
+        }
      }
    } }
  
@@ -486,25 +496,41 @@ static void _net_init(Point_process* _pnt, double* _args, double _lflag) {
     Datum* _ppvar = _pnt->_prop->dparam;
     Datum* _thread = (Datum*)0;
     NrnThread* _nt = (NrnThread*)_pnt->_vnt;
- _args[4] = t ;
-   }
+ }
  
 static int  setRNG ( _threadargsproto_ ) {
    
 /*VERBATIM*/
-    {
-        /**
-         * This function takes a NEURON Random object declared in hoc and makes it usable by this mod file.
-         * Note that this method is taken from Brett paper as used by netstim.hoc and netstim.mod
-         * which points out that the Random must be in uniform(1) mode
-         */
-        void** pv = (void**)(&_p_rng);
-        if( ifarg(1)) {
-            *pv = nrn_random_arg(1);
-        } else {
-            *pv = (void*)0;
+    #ifndef CORENEURON_BUILD
+    // For compatibility, allow for either MCellRan4 or Random123
+    // Distinguish by the arg types
+    // Object => MCellRan4, seeds (double) => Random123
+    usingR123 = 0;
+    if( ifarg(1) && hoc_is_double_arg(1) ) {
+        nrnran123_State** pv = (nrnran123_State**)(&_p_rng);
+        uint32_t a2 = 0;
+        uint32_t a3 = 0;
+
+        if (*pv) {
+            nrnran123_deletestream(*pv);
+            *pv = (nrnran123_State*)0;
         }
+        if (ifarg(2)) {
+            a2 = (uint32_t)*getarg(2);
+        }
+        if (ifarg(3)) {
+            a3 = (uint32_t)*getarg(3);
+        }
+        *pv = nrnran123_newstream3((uint32_t)*getarg(1), a2, a3);
+        usingR123 = 1;
+    } else if( ifarg(1) ) {   // not a double, so assume hoc object type
+        void** pv = (void**)(&_p_rng);
+        *pv = nrn_random_arg(1);
+    } else {  // no arg, so clear pointer
+        void** pv = (void**)(&_p_rng);
+        *pv = (void*)0;
     }
+    #endif
   return 0; }
  
 static double _hoc_setRNG(void* _vptr) {
@@ -523,23 +549,19 @@ double urand ( _threadargsproto_ ) {
    double _lurand;
  
 /*VERBATIM*/
-        double value;
-        if (_p_rng) {
-                /*
-                :Supports separate independent but reproducible streams for
-                : each instance. However, the corresponding hoc Random
-                : distribution MUST be set to Random.negexp(1)
-                */
-                value = nrn_random_pick(_p_rng);
-                //printf("random stream for this simulation = %lf\n",value);
-                return value;
-        }else{
- value = scop_random ( 1.0 ) ;
-   
-/*VERBATIM*/
-        }
- _lurand = value ;
-   
+    double value = 0.0;
+    if ( usingR123 ) {
+        value = nrnran123_dblpick((nrnran123_State*)_p_rng);
+    } else if (_p_rng) {
+        #ifndef CORENEURON_BUILD
+        value = nrn_random_pick(_p_rng);
+        #endif
+    } else {
+        // Note: prior versions used scop_random(1), but since we never use this model without configuring the rng.  Maybe should throw error?
+        value = 0.0;
+    }
+    _lurand = value;
+ 
 return _lurand;
  }
  
@@ -551,6 +573,62 @@ static double _hoc_urand(void* _vptr) {
   _thread = _extcall_thread;
   _nt = (NrnThread*)((Point_process*)_vptr)->_vnt;
  _r =  urand ( _p, _ppvar, _thread, _nt );
+ return(_r);
+}
+ 
+double bbsavestate ( _threadargsproto_ ) {
+   double _lbbsavestate;
+ _lbbsavestate = 0.0 ;
+   
+/*VERBATIM*/
+#ifndef CORENEURON_BUILD
+        /* first arg is direction (0 save, 1 restore), second is array*/
+        /* if first arg is -1, fill xdir with the size of the array */
+        double *xdir, *xval, *hoc_pgetarg();
+        long nrn_get_random_sequence(void* r);
+        void nrn_set_random_sequence(void* r, int val);
+        xdir = hoc_pgetarg(1);
+        xval = hoc_pgetarg(2);
+        if (_p_rng) {
+            // tell how many items need saving
+            if (*xdir == -1) {  // count items
+                if( usingR123 ) {
+                    *xdir = 2.0;
+                } else {
+                    *xdir = 1.0;
+                }
+                return 0.0;
+            } else if(*xdir ==0 ) {  // save
+                if( usingR123 ) {
+                    uint32_t seq;
+                    char which;
+                    nrnran123_getseq( (nrnran123_State*)_p_rng, &seq, &which );
+                    xval[0] = (double) seq;
+                    xval[1] = (double) which;
+                } else {
+                    xval[0] = (double)nrn_get_random_sequence(_p_rng);
+                }
+            } else {  // restore
+                if( usingR123 ) {
+                    nrnran123_setseq( (nrnran123_State*)_p_rng, (uint32_t)xval[0], (char)xval[1] );
+                } else {
+                    nrn_set_random_sequence(_p_rng, (long)(xval[0]));
+                }
+            }
+        }
+#endif
+ 
+return _lbbsavestate;
+ }
+ 
+static double _hoc_bbsavestate(void* _vptr) {
+ double _r;
+   double* _p; Datum* _ppvar; Datum* _thread; NrnThread* _nt;
+   _p = ((Point_process*)_vptr)->_prop->param;
+  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
+  _thread = _extcall_thread;
+  _nt = (NrnThread*)((Point_process*)_vptr)->_vnt;
+ _r =  bbsavestate ( _p, _ppvar, _thread, _nt );
  return(_r);
 }
  
@@ -572,22 +650,35 @@ static double _hoc_toggleVerbose(void* _vptr) {
  return(_r);
 }
  
-static int _ode_count(int _type){ hoc_execerror("ProbAMPANMDA_EMS", "cannot be used with CVODE"); return 0;}
- 
-static void _thread_mem_init(Datum* _thread) {
-  if (_thread1data_inuse) {_thread[_gth]._pval = (double*)ecalloc(1, sizeof(double));
- }else{
- _thread[_gth]._pval = _thread1data; _thread1data_inuse = 1;
- }
- }
- 
-static void _thread_cleanup(Datum* _thread) {
-  if (_thread[_gth]._pval == _thread1data) {
-   _thread1data_inuse = 0;
-  }else{
-   free((void*)_thread[_gth]._pval);
+/*VERBATIM*/
+static void bbcore_write(double* x, int* d, int* xx, int* offset, _threadargsproto_) {
+  if (d) {
+    uint32_t* di = ((uint32_t*)d) + *offset;
+    nrnran123_State** pv = (nrnran123_State**)(&_p_rng);
+    nrnran123_getids3(*pv, di, di+1, di+2);
+
+    char which;
+    nrnran123_getseq(*pv, di+3, &which);
+    di[4] = (int)which;
+    //printf("ProbAMPANMDA_EMS bbcore_write %d %d %d\n", di[0], di[1], di[2]);
+    }
+  *offset += 5;
+}
+
+static void bbcore_read(double* x, int* d, int* xx, int* offset, _threadargsproto_) {
+  assert(!_p_rng);
+  uint32_t* di = ((uint32_t*)d) + *offset;
+  if (di[0] != 0 || di[1] != 0 || di[2] != 0) {
+      nrnran123_State** pv = (nrnran123_State**)(&_p_rng);
+      *pv = nrnran123_newstream3(di[0], di[1], di[2]);
+      unsigned char which = (unsigned char)di[4];
+      nrnran123_setseq(*pv, di[3], which);
   }
- }
+  //printf("ProbAMPANMDA_EMS bbcore_read %d %d %d\n", di[0], di[1], di[2]);
+  *offset += 5;
+}
+ 
+static int _ode_count(int _type){ hoc_execerror("ProbAMPANMDA_EMS", "cannot be used with CVODE"); return 0;}
 
 static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) {
   int _i; double _save;{
@@ -597,9 +688,10 @@ static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt)
   B_AMPA = B_AMPA0;
  {
    double _ltp_AMPA , _ltp_NMDA ;
- Rstate = 1.0 ;
-   tsyn_fac = 0.0 ;
+ tsyn = 0.0 ;
    u = u0 ;
+   unoccupied = 0.0 ;
+   occupied = Nrrp ;
    A_AMPA = 0.0 ;
    B_AMPA = 0.0 ;
    A_NMDA = 0.0 ;
@@ -614,7 +706,12 @@ static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt)
    B_AMPA_step = exp ( dt * ( ( - 1.0 ) / tau_d_AMPA ) ) ;
    A_NMDA_step = exp ( dt * ( ( - 1.0 ) / tau_r_NMDA ) ) ;
    B_NMDA_step = exp ( dt * ( ( - 1.0 ) / tau_d_NMDA ) ) ;
-   }
+   
+/*VERBATIM*/
+        if( usingR123 ) {
+            nrnran123_setseq((nrnran123_State*)_p_rng, 0, 0);
+        }
+ }
  
 }
 }
@@ -764,32 +861,18 @@ _first = 0;
 static const char* nmodl_filename = "ProbAMPANMDA_EMS.mod";
 static const char* nmodl_file_text = 
   "COMMENT\n"
-  "/*                                                                               \n"
-  "Copyright (c) 2015 EPFL-BBP, All rights reserved.                                \n"
-  "                                                                                 \n"
-  "THIS SOFTWARE IS PROVIDED BY THE BLUE BRAIN PROJECT ``AS IS''                    \n"
-  "AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,            \n"
-  "THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR           \n"
-  "PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE BLUE BRAIN PROJECT                 \n"
-  "BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR           \n"
-  "CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             \n"
-  "SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR                  \n"
-  "BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,            \n"
-  "WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE             \n"
-  "OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN           \n"
-  "IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                    \n"
-  "                                                                                 \n"
-  "This work is licensed under a                                                    \n"
-  "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. \n"
-  "To view a copy of this license, visit                                            \n"
-  "http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode or send a letter to   \n"
-  "Creative Commons,                                                                \n"
-  "171 Second Street, Suite 300,                                                    \n"
-  "San Francisco, California, 94105, USA.                                           \n"
-  "*/                 \n"
+  "/**\n"
+  " * @file ProbAMPANMDA_EMS.mod\n"
+  " * @brief\n"
+  " * @author king, muller, reimann, ramaswamy\n"
+  " * @date 2011-08-17\n"
+  " * @remark Copyright \n"
+  "\n"
+  " BBP/EPFL 2005-2011; All rights reserved. Do not distribute without further notice.\n"
+  " */\n"
   "ENDCOMMENT\n"
   "\n"
-  "TITLE Probabilistic AMPA and NMDA receptor with presynaptic short-term plasticity \n"
+  "TITLE Probabilistic AMPA and NMDA receptor with presynaptic short-term plasticity\n"
   "\n"
   "\n"
   "COMMENT\n"
@@ -800,9 +883,9 @@ static const char* nmodl_file_text =
   "Modification of ProbAMPANMDA: 2-State model by Eilif Muller, Michael Reimann, Srikanth Ramaswamy, Blue Brain Project, August 2011\n"
   "This new model was motivated by the following constraints:\n"
   "\n"
-  "1) No consumption on failure.  \n"
+  "1) No consumption on failure.\n"
   "2) No release just after release until recovery.\n"
-  "3) Same ensemble averaged trace as deterministic/canonical Tsodyks-Markram \n"
+  "3) Same ensemble averaged trace as deterministic/canonical Tsodyks-Markram\n"
   "   using same parameters determined from experiment.\n"
   "4) Same quantal size as present production probabilistic model.\n"
   "\n"
@@ -817,52 +900,54 @@ static const char* nmodl_file_text =
   "releases, it will transition to the unrecovered state.  Recovery is as\n"
   "a Poisson process with rate 1/Dep.\n"
   "\n"
-  "This model satisfies all of (1)-(4).\n"
+  "This model satisys all of (1)-(4).\n"
+  "\n"
+  "\n"
   "ENDCOMMENT\n"
   "\n"
-  "COMMENT                                                                          \n"
-  "/**                                                                              \n"
-  " @file ProbAMPANMDA_EMS.mod                                                        \n"
-  " @brief Probabilistic AMPA and NMDA receptor with presynaptic short-term plasticity                   \n"
-  " @author Eilif Muller, Michael Reimann, Srikanth Ramaswamy, James King @ BBP     \n"
-  " @date 2011                                                                      \n"
-  "*/                                                                               \n"
-  "ENDCOMMENT  \n"
   "\n"
   "NEURON {\n"
   "    THREADSAFE\n"
-  "        POINT_PROCESS ProbAMPANMDA_EMS\n"
-  "        RANGE tau_r_AMPA, tau_d_AMPA, tau_r_NMDA, tau_d_NMDA\n"
-  "        RANGE Use, u, Dep, Fac, u0, mg, Rstate, tsyn_fac, u\n"
-  "        RANGE i, i_AMPA, i_NMDA, g_AMPA, g_NMDA, g, e, NMDA_ratio\n"
-  "        RANGE A_AMPA_step, B_AMPA_step, A_NMDA_step, B_NMDA_step\n"
-  "        NONSPECIFIC_CURRENT i\n"
-  "        POINTER rng\n"
-  "        RANGE synapseID, verboseLevel\n"
+  "    POINT_PROCESS ProbAMPANMDA_EMS\n"
+  "\n"
+  "    GLOBAL tau_r_AMPA\n"
+  "    RANGE tau_d_AMPA, g_AMPA, i_AMPA\n"
+  "\n"
+  "    GLOBAL tau_r_NMDA, tau_d_NMDA\n"
+  "    RANGE g_NMDA, i_NMDA\n"
+  "\n"
+  "    RANGE Use, u, Dep, Fac, u0, mg, tsyn\n"
+  "    RANGE unoccupied, occupied, Nrrp\n"
+  "\n"
+  "    RANGE g, NMDA_ratio\n"
+  "    RANGE A_AMPA_step, B_AMPA_step, A_NMDA_step, B_NMDA_step\n"
+  "    GLOBAL e\n"
+  "    NONSPECIFIC_CURRENT i\n"
+  "    BBCOREPOINTER rng\n"
+  "    RANGE synapseID, selected_for_report, verboseLevel\n"
   "}\n"
   "\n"
   "PARAMETER {\n"
-  "\n"
-  "\n"
   "        tau_r_AMPA = 0.2   (ms)  : dual-exponential conductance profile\n"
   "        tau_d_AMPA = 1.7    (ms)  : IMPORTANT: tau_r < tau_d\n"
   "        tau_r_NMDA = 0.29   (ms) : dual-exponential conductance profile\n"
   "        tau_d_NMDA = 43     (ms) : IMPORTANT: tau_r < tau_d\n"
-  "        Use = 1.0   (1)   : Utilization of synaptic efficacy (just initial values! Use, Dep and Fac are overwritten by BlueBuilder assigned values) \n"
+  "        Use = 1.0   (1)   : Utilization of synaptic efficacy (just initial values! Use, Dep and Fac are overwritten by BlueBuilder assigned values)\n"
   "        Dep = 100   (ms)  : relaxation time constant from depression\n"
   "        Fac = 10   (ms)  :  relaxation time constant from facilitation\n"
   "        e = 0     (mV)  : AMPA and NMDA reversal potential\n"
   "        mg = 1   (mM)  : initial concentration of mg2+\n"
-  "        mggate\n"
   "        gmax = .001 (uS) : weight conversion factor (from nS to uS)\n"
   "        u0 = 0 :initial value of u, which is the running value of release probability\n"
+  "        Nrrp = 1 (1)  : Number of total release sites for given contact\n"
   "        synapseID = 0\n"
   "        verboseLevel = 0\n"
-  "	NMDA_ratio = 0.71 (1) : The ratio of NMDA to AMPA\n"
+  "        selected_for_report = 0\n"
+  "        NMDA_ratio = 0.71 (1) : The ratio of NMDA to AMPA\n"
   "}\n"
   "\n"
   "COMMENT\n"
-  "The Verbatim block is needed to generate random nos. from a uniform distribution between 0 and 1 \n"
+  "The Verbatim block is needed to generate random nos. from a uniform distribution between 0 and 1\n"
   "for comparison with Pr to decide whether to activate the synapse or not\n"
   "ENDCOMMENT\n"
   "\n"
@@ -871,12 +956,13 @@ static const char* nmodl_file_text =
   "#include<stdlib.h>\n"
   "#include<stdio.h>\n"
   "#include<math.h>\n"
+  "#include \"nrnran123.h\"\n"
   "\n"
   "double nrn_random_pick(void* r);\n"
   "void* nrn_random_arg(int argpos);\n"
   "\n"
   "ENDVERBATIM\n"
-  "  \n"
+  "\n"
   "\n"
   "ASSIGNED {\n"
   "\n"
@@ -894,17 +980,16 @@ static const char* nmodl_file_text =
   "        A_NMDA_step\n"
   "        B_NMDA_step\n"
   "        rng\n"
+  "        mggate\n"
+  "        usingR123            : TEMPORARY until mcellran4 completely deprecated\n"
   "\n"
-  "	: Recording these three, you can observe full state of model\n"
-  "	: tsyn_fac gives you presynaptic times, Rstate gives you \n"
-  "        : state transitions,\n"
-  "        : u gives you the \"release probability\" at transitions \n"
-  "        : (attention: u is event based based, so only valid at incoming events)\n"
-  "	Rstate (1) : recovered state {0=unrecovered, 1=recovered}\n"
-  "	tsyn_fac (ms) : the time of the last spike\n"
-  "	u (1) : running release probability\n"
-  "\n"
+  "        : MVR\n"
+  "        unoccupied (1) : no. of unoccupied sites following release event\n"
+  "        occupied   (1) : no. of occupied sites following one epoch of recovery\n"
+  "        tsyn (ms) : the time of the last spike\n"
+  "        u (1) : running release probability\n"
   "}\n"
+  "\n"
   "\n"
   "STATE {\n"
   "\n"
@@ -914,26 +999,29 @@ static const char* nmodl_file_text =
   "        B_NMDA       : NMDA state variable to construct the dual-exponential profile - decays with conductance tau_d_NMDA\n"
   "}\n"
   "\n"
-  "INITIAL{\n"
   "\n"
+  "INITIAL {\n"
   "        LOCAL tp_AMPA, tp_NMDA\n"
   "\n"
-  "	Rstate=1\n"
-  "	tsyn_fac=0\n"
-  "	u=u0\n"
-  "        \n"
+  "        tsyn = 0\n"
+  "        u=u0\n"
+  "\n"
+  "        : MVR\n"
+  "        unoccupied = 0\n"
+  "        occupied = Nrrp\n"
+  "\n"
   "        A_AMPA = 0\n"
   "        B_AMPA = 0\n"
-  "        \n"
+  "\n"
   "        A_NMDA = 0\n"
   "        B_NMDA = 0\n"
-  "        \n"
+  "\n"
   "        tp_AMPA = (tau_r_AMPA*tau_d_AMPA)/(tau_d_AMPA-tau_r_AMPA)*log(tau_d_AMPA/tau_r_AMPA) :time to peak of the conductance\n"
   "        tp_NMDA = (tau_r_NMDA*tau_d_NMDA)/(tau_d_NMDA-tau_r_NMDA)*log(tau_d_NMDA/tau_r_NMDA) :time to peak of the conductance\n"
-  "        \n"
+  "\n"
   "        factor_AMPA = -exp(-tp_AMPA/tau_r_AMPA)+exp(-tp_AMPA/tau_d_AMPA) :AMPA Normalization factor - so that when t = tp_AMPA, gsyn = gpeak\n"
   "        factor_AMPA = 1/factor_AMPA\n"
-  "        \n"
+  "\n"
   "        factor_NMDA = -exp(-tp_NMDA/tau_r_NMDA)+exp(-tp_NMDA/tau_d_NMDA) :NMDA Normalization factor - so that when t = tp_NMDA, gsyn = gpeak\n"
   "        factor_NMDA = 1/factor_NMDA\n"
   "\n"
@@ -941,6 +1029,12 @@ static const char* nmodl_file_text =
   "        B_AMPA_step = exp(dt*(( - 1.0 ) / tau_d_AMPA))\n"
   "        A_NMDA_step = exp(dt*(( - 1.0 ) / tau_r_NMDA))\n"
   "        B_NMDA_step = exp(dt*(( - 1.0 ) / tau_d_NMDA))\n"
+  "\n"
+  "        VERBATIM\n"
+  "        if( usingR123 ) {\n"
+  "            nrnran123_setseq((nrnran123_State*)_p_rng, 0, 0);\n"
+  "        }\n"
+  "        ENDVERBATIM\n"
   "}\n"
   "\n"
   "BREAKPOINT {\n"
@@ -963,134 +1057,224 @@ static const char* nmodl_file_text =
   "}\n"
   "\n"
   "\n"
-  "NET_RECEIVE (weight,weight_AMPA, weight_NMDA, Psurv, tsyn (ms)){\n"
-  "        LOCAL result\n"
-  "        weight_AMPA = weight\n"
-  "        weight_NMDA = weight * NMDA_ratio\n"
-  "	: Locals:\n"
-  "	: Psurv - survival probability of unrecovered state\n"
-  "	: tsyn - time since last surival evaluation.\n"
-  "	\n"
-  "        INITIAL{\n"
-  "                tsyn=t\n"
-  "        }\n"
+  "NET_RECEIVE (weight,weight_AMPA, weight_NMDA, Psurv) {\n"
+  "    LOCAL result, ves, occu\n"
+  "    weight_AMPA = weight\n"
+  "    weight_NMDA = weight * NMDA_ratio\n"
+  "    : Locals:\n"
+  "    : Psurv - survival probability of unrecovered state\n"
   "\n"
-  "    : Do not perform any calculations if the synapse (netcon) is deactivated.  This avoids drawing from the random stream\n"
-  "    if(  !(weight > 0) ) {\n"
-  "VERBATIM\n"
-  "        return;\n"
-  "ENDVERBATIM\n"
+  "    INITIAL {\n"
   "    }\n"
   "\n"
-  "        : calc u at event-\n"
-  "        if (Fac > 0) {\n"
-  "                u = u*exp(-(t - tsyn_fac)/Fac) :update facilitation variable if Fac>0 Eq. 2 in Fuhrmann et al.\n"
-  "           } else {\n"
-  "                  u = Use  \n"
-  "           } \n"
-  "           if(Fac > 0){\n"
-  "                  u = u + Use*(1-u) :update facilitation variable if Fac>0 Eq. 2 in Fuhrmann et al.\n"
-  "           }    \n"
+  "    : Do not perform any calculations if the synapse (netcon) is deactivated. This avoids drawing from\n"
+  "    : random number stream. Also, disable in case of t < 0 (in case of ForwardSkip) which causes numerical\n"
+  "    : instability if synapses are activated.\n"
+  "    if(  weight <= 0 || t < 0 ) {\n"
+  "    VERBATIM\n"
+  "        return;\n"
+  "    ENDVERBATIM\n"
+  "    }\n"
   "\n"
-  "	   : tsyn_fac knows about all spikes, not only those that released\n"
-  "	   : i.e. each spike can increase the u, regardless of recovered state.\n"
-  "	   tsyn_fac = t\n"
+  "    : calc u at event-\n"
+  "    if (Fac > 0) {\n"
+  "        u = u*exp(-(t - tsyn)/Fac) :update facilitation variable if Fac>0 Eq. 2 in Fuhrmann et al.\n"
+  "    } else {\n"
+  "        u = Use\n"
+  "    }\n"
+  "    if(Fac > 0){\n"
+  "        u = u + Use*(1-u) :update facilitation variable if Fac>0 Eq. 2 in Fuhrmann et al.\n"
+  "    }\n"
   "\n"
-  "	   : recovery\n"
+  "    : recovery\n"
+  "    FROM counter = 0 TO (unoccupied - 1) {\n"
+  "        : Iterate over all unoccupied sites and compute how many recover\n"
+  "        Psurv = exp(-(t-tsyn)/Dep)\n"
+  "        result = urand()\n"
+  "        if (result>Psurv) {\n"
+  "            occupied = occupied + 1     : recover a previously unoccupied site\n"
+  "            if( verboseLevel > 0 ) {\n"
+  "                UNITSOFF\n"
+  "                printf( \"Recovered! %f at time %g: Psurv = %g, urand=%g\\n\", synapseID, t, Psurv, result )\n"
+  "                UNITSON\n"
+  "            }\n"
+  "        }\n"
+  "    }\n"
   "\n"
-  "	   if (Rstate == 0) {\n"
-  "	   : probability of survival of unrecovered state based on Poisson recovery with rate 1/tau\n"
-  "	          Psurv = exp(-(t-tsyn)/Dep)\n"
-  "		  result = urand()\n"
-  "		  if (result>Psurv) {\n"
-  "		         Rstate = 1     : recover      \n"
+  "    ves = 0                  : Initialize the number of released vesicles to 0\n"
+  "    occu = occupied - 1  : Store the number of occupied sites in a local variable\n"
   "\n"
-  "                         if( verboseLevel > 0 ) {\n"
-  "                             printf( \"Recovered! %f at time %g: Psurv = %g, urand=%g\\n\", synapseID, t, Psurv, result )\n"
-  "                         }\n"
+  "    FROM counter = 0 TO occu {\n"
+  "        : iterate over all occupied sites and compute how many release\n"
+  "        result = urand()\n"
+  "        if (result<u) {\n"
+  "            : release a single site!\n"
+  "            occupied = occupied - 1  : decrease the number of occupied sites by 1\n"
+  "            ves = ves + 1            : increase number of relesed vesicles by 1\n"
+  "        }\n"
+  "    }\n"
   "\n"
-  "		  }\n"
-  "		  else {\n"
-  "		         : survival must now be from this interval\n"
-  "		         tsyn = t\n"
-  "                         if( verboseLevel > 0 ) {\n"
-  "                             printf( \"Failed to recover! %f at time %g: Psurv = %g, urand=%g\\n\", synapseID, t, Psurv, result )\n"
-  "                         }\n"
-  "		  }\n"
-  "           }	   \n"
-  "	   \n"
-  "	   if (Rstate == 1) {\n"
-  "   	          result = urand()\n"
-  "		  if (result<u) {\n"
-  "		  : release!\n"
-  "   		         tsyn = t\n"
-  "			 Rstate = 0\n"
-  "                         A_AMPA = A_AMPA + weight_AMPA*factor_AMPA\n"
-  "                         B_AMPA = B_AMPA + weight_AMPA*factor_AMPA\n"
-  "                         A_NMDA = A_NMDA + weight_NMDA*factor_NMDA\n"
-  "                         B_NMDA = B_NMDA + weight_NMDA*factor_NMDA\n"
-  "                         \n"
-  "                         if( verboseLevel > 0 ) {\n"
-  "                             printf( \"Release! %f at time %g: vals %g %g %g %g\\n\", synapseID, t, A_AMPA, weight_AMPA, factor_AMPA, weight )\n"
-  "                         }\n"
-  "		  		  \n"
-  "		  }\n"
-  "		  else {\n"
-  "		         if( verboseLevel > 0 ) {\n"
-  "			     printf(\"Failure! %f at time %g: urand = %g\\n\", synapseID, t, result )\n"
-  "		         }\n"
+  "    : Update number of unoccupied sites\n"
+  "    unoccupied = Nrrp - occupied\n"
   "\n"
-  "		  }\n"
+  "    : Update tsyn\n"
+  "    : tsyn knows about all spikes, not only those that released\n"
+  "    : i.e. each spike can increase the u, regardless of recovered state.\n"
+  "    :      and each spike trigger an evaluation of recovery\n"
+  "    tsyn = t\n"
   "\n"
-  "	   }\n"
+  "    if (ves > 0) { :no need to evaluate unless we have vesicle release\n"
+  "        A_AMPA = A_AMPA + ves/Nrrp*weight_AMPA*factor_AMPA\n"
+  "        B_AMPA = B_AMPA + ves/Nrrp*weight_AMPA*factor_AMPA\n"
+  "        A_NMDA = A_NMDA + ves/Nrrp*weight_NMDA*factor_NMDA\n"
+  "        B_NMDA = B_NMDA + ves/Nrrp*weight_NMDA*factor_NMDA\n"
   "\n"
+  "        if ( verboseLevel > 0 ) {\n"
+  "            UNITSOFF\n"
+  "            printf( \"Release! %f at time %g: vals %g %g %g %g\\n\", synapseID, t, A_AMPA, weight_AMPA, factor_AMPA, weight )\n"
+  "            UNITSON\n"
+  "        }\n"
+  "\n"
+  "    } else {\n"
+  "        : total release failure\n"
+  "        if ( verboseLevel > 0 ) {\n"
+  "            UNITSOFF\n"
+  "            printf( \" || SYN_ID: %f, release failure || \", synapseID )\n"
+  "            UNITSON\n"
+  "        }\n"
+  "    }\n"
   "}\n"
+  "\n"
   "\n"
   "PROCEDURE setRNG() {\n"
   "VERBATIM\n"
-  "    {\n"
-  "        /**\n"
-  "         * This function takes a NEURON Random object declared in hoc and makes it usable by this mod file.\n"
-  "         * Note that this method is taken from Brett paper as used by netstim.hoc and netstim.mod\n"
-  "         * which points out that the Random must be in uniform(1) mode\n"
-  "         */\n"
-  "        void** pv = (void**)(&_p_rng);\n"
-  "        if( ifarg(1)) {\n"
-  "            *pv = nrn_random_arg(1);\n"
-  "        } else {\n"
-  "            *pv = (void*)0;\n"
+  "    #ifndef CORENEURON_BUILD\n"
+  "    // For compatibility, allow for either MCellRan4 or Random123\n"
+  "    // Distinguish by the arg types\n"
+  "    // Object => MCellRan4, seeds (double) => Random123\n"
+  "    usingR123 = 0;\n"
+  "    if( ifarg(1) && hoc_is_double_arg(1) ) {\n"
+  "        nrnran123_State** pv = (nrnran123_State**)(&_p_rng);\n"
+  "        uint32_t a2 = 0;\n"
+  "        uint32_t a3 = 0;\n"
+  "\n"
+  "        if (*pv) {\n"
+  "            nrnran123_deletestream(*pv);\n"
+  "            *pv = (nrnran123_State*)0;\n"
   "        }\n"
+  "        if (ifarg(2)) {\n"
+  "            a2 = (uint32_t)*getarg(2);\n"
+  "        }\n"
+  "        if (ifarg(3)) {\n"
+  "            a3 = (uint32_t)*getarg(3);\n"
+  "        }\n"
+  "        *pv = nrnran123_newstream3((uint32_t)*getarg(1), a2, a3);\n"
+  "        usingR123 = 1;\n"
+  "    } else if( ifarg(1) ) {   // not a double, so assume hoc object type\n"
+  "        void** pv = (void**)(&_p_rng);\n"
+  "        *pv = nrn_random_arg(1);\n"
+  "    } else {  // no arg, so clear pointer\n"
+  "        void** pv = (void**)(&_p_rng);\n"
+  "        *pv = (void*)0;\n"
   "    }\n"
+  "    #endif\n"
   "ENDVERBATIM\n"
   "}\n"
   "\n"
+  "\n"
   "FUNCTION urand() {\n"
   "VERBATIM\n"
-  "        double value;\n"
-  "        if (_p_rng) {\n"
-  "                /*\n"
-  "                :Supports separate independent but reproducible streams for\n"
-  "                : each instance. However, the corresponding hoc Random\n"
-  "                : distribution MUST be set to Random.negexp(1)\n"
-  "                */\n"
-  "                value = nrn_random_pick(_p_rng);\n"
-  "                //printf(\"random stream for this simulation = %lf\\n\",value);\n"
-  "                return value;\n"
-  "        }else{\n"
+  "    double value = 0.0;\n"
+  "    if ( usingR123 ) {\n"
+  "        value = nrnran123_dblpick((nrnran123_State*)_p_rng);\n"
+  "    } else if (_p_rng) {\n"
+  "        #ifndef CORENEURON_BUILD\n"
+  "        value = nrn_random_pick(_p_rng);\n"
+  "        #endif\n"
+  "    } else {\n"
+  "        // Note: prior versions used scop_random(1), but since we never use this model without configuring the rng.  Maybe should throw error?\n"
+  "        value = 0.0;\n"
+  "    }\n"
+  "    _lurand = value;\n"
   "ENDVERBATIM\n"
-  "                : the old standby. Cannot use if reproducible parallel sim\n"
-  "                : independent of nhost or which host this instance is on\n"
-  "                : is desired, since each instance on this cpu draws from\n"
-  "                : the same stream\n"
-  "                value = scop_random(1)\n"
+  "}\n"
+  "\n"
+  "\n"
+  "FUNCTION bbsavestate() {\n"
+  "        bbsavestate = 0\n"
   "VERBATIM\n"
+  "#ifndef CORENEURON_BUILD\n"
+  "        /* first arg is direction (0 save, 1 restore), second is array*/\n"
+  "        /* if first arg is -1, fill xdir with the size of the array */\n"
+  "        double *xdir, *xval, *hoc_pgetarg();\n"
+  "        long nrn_get_random_sequence(void* r);\n"
+  "        void nrn_set_random_sequence(void* r, int val);\n"
+  "        xdir = hoc_pgetarg(1);\n"
+  "        xval = hoc_pgetarg(2);\n"
+  "        if (_p_rng) {\n"
+  "            // tell how many items need saving\n"
+  "            if (*xdir == -1) {  // count items\n"
+  "                if( usingR123 ) {\n"
+  "                    *xdir = 2.0;\n"
+  "                } else {\n"
+  "                    *xdir = 1.0;\n"
+  "                }\n"
+  "                return 0.0;\n"
+  "            } else if(*xdir ==0 ) {  // save\n"
+  "                if( usingR123 ) {\n"
+  "                    uint32_t seq;\n"
+  "                    char which;\n"
+  "                    nrnran123_getseq( (nrnran123_State*)_p_rng, &seq, &which );\n"
+  "                    xval[0] = (double) seq;\n"
+  "                    xval[1] = (double) which;\n"
+  "                } else {\n"
+  "                    xval[0] = (double)nrn_get_random_sequence(_p_rng);\n"
+  "                }\n"
+  "            } else {  // restore\n"
+  "                if( usingR123 ) {\n"
+  "                    nrnran123_setseq( (nrnran123_State*)_p_rng, (uint32_t)xval[0], (char)xval[1] );\n"
+  "                } else {\n"
+  "                    nrn_set_random_sequence(_p_rng, (long)(xval[0]));\n"
+  "                }\n"
+  "            }\n"
   "        }\n"
+  "#endif\n"
   "ENDVERBATIM\n"
-  "        urand = value\n"
   "}\n"
   "\n"
   "FUNCTION toggleVerbose() {\n"
   "    verboseLevel = 1-verboseLevel\n"
   "}\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "static void bbcore_write(double* x, int* d, int* xx, int* offset, _threadargsproto_) {\n"
+  "  if (d) {\n"
+  "    uint32_t* di = ((uint32_t*)d) + *offset;\n"
+  "    nrnran123_State** pv = (nrnran123_State**)(&_p_rng);\n"
+  "    nrnran123_getids3(*pv, di, di+1, di+2);\n"
+  "\n"
+  "    char which;\n"
+  "    nrnran123_getseq(*pv, di+3, &which);\n"
+  "    di[4] = (int)which;\n"
+  "    //printf(\"ProbAMPANMDA_EMS bbcore_write %d %d %d\\n\", di[0], di[1], di[2]);\n"
+  "    }\n"
+  "  *offset += 5;\n"
+  "}\n"
+  "\n"
+  "static void bbcore_read(double* x, int* d, int* xx, int* offset, _threadargsproto_) {\n"
+  "  assert(!_p_rng);\n"
+  "  uint32_t* di = ((uint32_t*)d) + *offset;\n"
+  "  if (di[0] != 0 || di[1] != 0 || di[2] != 0) {\n"
+  "      nrnran123_State** pv = (nrnran123_State**)(&_p_rng);\n"
+  "      *pv = nrnran123_newstream3(di[0], di[1], di[2]);\n"
+  "      unsigned char which = (unsigned char)di[4];\n"
+  "      nrnran123_setseq(*pv, di[3], which);\n"
+  "  }\n"
+  "  //printf(\"ProbAMPANMDA_EMS bbcore_read %d %d %d\\n\", di[0], di[1], di[2]);\n"
+  "  *offset += 5;\n"
+  "}\n"
+  "ENDVERBATIM\n"
+  "\n"
   ;
 #endif

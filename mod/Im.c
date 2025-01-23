@@ -89,7 +89,6 @@ extern "C" {
  static Datum* _extcall_thread;
  static Prop* _extcall_prop;
  /* external NEURON variables */
- extern double celsius;
  /* declaration of user functions */
  static void _hoc_rates(void);
  static int _mechtype;
@@ -266,7 +265,7 @@ static int _ode_spec1(_threadargsproto_);
  
 static int  rates ( _threadargsproto_ ) {
    double _lqt ;
- _lqt = pow( 2.3 , ( ( celsius - 21.0 ) / 10.0 ) ) ;
+ _lqt = pow( 2.3 , ( ( 34.0 - 21.0 ) / 10.0 ) ) ;
     mAlpha = 3.3e-3 * exp ( 2.5 * 0.04 * ( v - - 35.0 ) ) ;
    mBeta = 3.3e-3 * exp ( - 2.5 * 0.04 * ( v - - 35.0 ) ) ;
    mInf = mAlpha / ( mAlpha + mBeta ) ;
@@ -539,8 +538,7 @@ static const char* nmodl_file_text =
   "\n"
   "PROCEDURE rates(){\n"
   "  LOCAL qt\n"
-  "  :qt = 2.3^((34-21)/10)\n"
-  "  qt = 2.3^((celsius-21)/10)\n"
+  "  qt = 2.3^((34-21)/10)\n"
   "\n"
   "	UNITSOFF\n"
   "		mAlpha = 3.3e-3*exp(2.5*0.04*(v - -35))\n"
