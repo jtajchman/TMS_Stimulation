@@ -440,6 +440,7 @@ class SingleExtracellular(ExtracellularStim):
     
 
     def run_simulation(self):
+        sim.cfg.duration = self.time[-1]
         runSimWithIntervalFunc('dt', self.interval_func, func_first=True)
         sim.gatherData()
 

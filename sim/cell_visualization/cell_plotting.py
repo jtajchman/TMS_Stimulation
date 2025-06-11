@@ -20,14 +20,10 @@ def load_cell_netpyne(cellName):
     cfg = specs.SimConfig()
     netParams = specs.NetParams()
 
-    # curr_dir = os.getcwd()
-    # dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    # os.chdir(dir_path)
     netParams.popParams[cellName] = {'cellType': cellName, 'cellModel': 'HH_full', 'numCells': 1}
     with set_cwd("sim"):
         netParams.loadCellParamsRule(label = cellName, fileName = f'cells/{cellName}_cellParams.json') 
     netParams.cellParams[cellName]['conds']['cellType'] = cellName
-    # os.chdir(curr_dir)
 
     with suppress_stdout():
         sim.initialize(
@@ -132,7 +128,18 @@ def plot_cell_3D(cell_name_ID: str, title=None, plotter=None, notebook=True, sho
 
 def plot_cell_3D_w_init_site(cell_name_ID: str, tms_params: dict = None, sim_results: str = None, title=None, plotter=None, notebook=True, show=True):
     cell = load_cell_netpyne(cell_name_ID)
+    ecs = SingleExtracellular(cell=cell, v_recording=True, **tms_params)
+    idxs = []
+    i = 0
+    for sec in ecs.stim_cell.section_list:
+        sec_idxs = []
+        for seg in sec:
+            sec_idxs.append(i)
+            i += 1
+        idxs.append(sec_idxs)
+
     if tms_params is not None and sim_results is None:
+        cell = load_cell_netpyne(cell_name_ID)
         ecs = SingleExtracellular(cell=cell, v_recording=True, **tms_params)
         ecs.run_simulation()
         ecs.save_v_and_spikes()
@@ -141,12 +148,12 @@ def plot_cell_3D_w_init_site(cell_name_ID: str, tms_params: dict = None, sim_res
         with open(sim_results, 'rb') as f:
             [t, voltages, action_potentials, action_potentials_recording_ids] = pickle.load(f)
     else:
-        raise ValueError("tms_params of sim_results must be defined")
-        
+        raise ValueError("tms_params or sim_results must be defined")
+
     if plotter is None:
         plotter = Plotter(notebook=notebook, title=title)
     seg_pts, seg_diams = get_cell_points(cell_name_ID)
-    init_seg_pts, init_seg_diams, ninit_seg_pts, ninit_seg_diams = get_init_points(seg_pts, seg_diams, action_potentials_recording_ids)
+    init_seg_pts, init_seg_diams, ninit_seg_pts, ninit_seg_diams = get_init_points(seg_pts, seg_diams, action_potentials_recording_ids, idxs)
 
     init_splines = [pv.Spline(sec_points) for sec_points in init_seg_pts]
     ninit_splines = [pv.Spline(sec_points) for sec_points in ninit_seg_pts]
@@ -223,7 +230,7 @@ def get_cell_points(cell_name_ID):
     return rotate_coords(R, seg_pts), seg_diams
 
 
-def get_init_points(seg_pts, seg_diams, action_potentials_recording_ids):
+def get_init_points(seg_pts, seg_diams, action_potentials_recording_ids, idxs):
     init_ids = list(action_potentials_recording_ids)[:3]
     init_seg_pts = []
     init_seg_diams = []
@@ -231,14 +238,17 @@ def get_init_points(seg_pts, seg_diams, action_potentials_recording_ids):
     ninit_seg_diams = []
     
     i = 0
-    for sec_pts, sec_diams in zip(seg_pts, seg_diams):
+    # print(init_ids)
+    for sec_pts, sec_diams, sec_idxs in zip(seg_pts, seg_diams, idxs):
         j = np.array(range(len(sec_pts)-1))
-        init_j = sorted([l+1 for l in j if l+i in init_ids])
+        init_j = sorted([l for l in j if l+i in init_ids])
 
         if init_j == []: # No segments in this section initialized spiking
             ninit_seg_pts.append(sec_pts)
             ninit_seg_diams.append(sec_diams)
         else:
+            # print(init_j, np.array(init_j)+i)
+            # print(sec_idxs)
             init_bounds, ninit_bounds = get_sec_bounds_idx(init_j, len(sec_pts)-1)
             for bound in init_bounds:
                 init_seg_pts.append(sec_pts[bound[0]:bound[1]])
@@ -259,21 +269,15 @@ def get_sec_bounds_idx(k, max_idx):
     excl_bounds = []
     for i, j in enumerate(k):
         if i > 0 and j == k[i-1]+1: # Current bound extends the previous set
-            incl_bounds[-1][1] = j+1
+            incl_bounds[-1][1] = j+2
         else: # General case: add new set of bounds
-            bound = [j-1, j+1]
+            bound = [j, j+2]
             incl_bounds.append(bound)
     for i, incl_bound in enumerate(incl_bounds):
         if i == 0 and incl_bound[0] > 0: # If there are idxs before first included lower bound
-                excl_bounds.append([0, incl_bound[0]+1]) # Exclude them
+            excl_bounds.append([0, incl_bound[0]+1]) # Exclude them
         if i < len(incl_bounds)-1: # If there are more components to the included bounds
             excl_bounds.append([incl_bound[1]-1, incl_bounds[i+1][0]+1]) # Exclude the space between bounds
         elif incl_bound[1] != max_idx+1: # If there are idxs after last included upper bound
-                excl_bounds.append([incl_bound[1]-1, max_idx+1]) # Exclude them
+            excl_bounds.append([incl_bound[1]-1, max_idx+1]) # Exclude them
     return incl_bounds, excl_bounds
-
-
-def add_segs(l, segs):
-    if len(segs) > 1:
-        l.append(segs)
-    return l

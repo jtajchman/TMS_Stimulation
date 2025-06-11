@@ -62,7 +62,7 @@ def plot_cell_3D_w_voltages(cell_name_ID: str, tms_params: dict = None, sim_resu
     
     def callback(time):
         t_ind = list(t).index(float(time))
-        for spline, v_time_course in zip(splines, voltages):
+        for spline, v_time_course in zip(splines, mean_sec_voltages):
             spline["voltage"] = v_time_course[t_ind]
     # plotter.add_timer_event(max_steps=200, duration=500, callback=callback)
     # plotter.add_slider_widget(callback=callback, rng=(0, 1), value=0, interaction_event="always", style="modern")
@@ -96,4 +96,4 @@ def plot_cell_all(cell_name_ID: str, tms_params: dict = None, sim_results: str =
         plotter.link_views()
 
         if show:
-            plotter.show()#jupyter_backend='client' # trame, client, server
+            plotter.show(jupyter_backend='trame')#jupyter_backend='client' # trame, client, server
