@@ -127,17 +127,6 @@ def plot_cell_3D(cell_name_ID: str, title=None, plotter=None, notebook=True, sho
 
 
 def plot_cell_3D_w_init_site(cell_name_ID: str, tms_params: dict = None, sim_results: str = None, title=None, plotter=None, notebook=True, show=True):
-    cell = load_cell_netpyne(cell_name_ID)
-    ecs = SingleExtracellular(cell=cell, v_recording=True, **tms_params)
-    idxs = []
-    i = 0
-    for sec in ecs.stim_cell.section_list:
-        sec_idxs = []
-        for seg in sec:
-            sec_idxs.append(i)
-            i += 1
-        idxs.append(sec_idxs)
-
     if tms_params is not None and sim_results is None:
         cell = load_cell_netpyne(cell_name_ID)
         ecs = SingleExtracellular(cell=cell, v_recording=True, **tms_params)
@@ -153,7 +142,7 @@ def plot_cell_3D_w_init_site(cell_name_ID: str, tms_params: dict = None, sim_res
     if plotter is None:
         plotter = Plotter(notebook=notebook, title=title)
     seg_pts, seg_diams = get_cell_points(cell_name_ID)
-    init_seg_pts, init_seg_diams, ninit_seg_pts, ninit_seg_diams = get_init_points(seg_pts, seg_diams, action_potentials_recording_ids, idxs)
+    init_seg_pts, init_seg_diams, ninit_seg_pts, ninit_seg_diams = get_init_points(seg_pts, seg_diams, action_potentials_recording_ids)
 
     init_splines = [pv.Spline(sec_points) for sec_points in init_seg_pts]
     ninit_splines = [pv.Spline(sec_points) for sec_points in ninit_seg_pts]
@@ -230,7 +219,7 @@ def get_cell_points(cell_name_ID):
     return rotate_coords(R, seg_pts), seg_diams
 
 
-def get_init_points(seg_pts, seg_diams, action_potentials_recording_ids, idxs):
+def get_init_points(seg_pts, seg_diams, action_potentials_recording_ids):
     init_ids = list(action_potentials_recording_ids)[:3]
     init_seg_pts = []
     init_seg_diams = []
@@ -239,7 +228,7 @@ def get_init_points(seg_pts, seg_diams, action_potentials_recording_ids, idxs):
     
     i = 0
     # print(init_ids)
-    for sec_pts, sec_diams, sec_idxs in zip(seg_pts, seg_diams, idxs):
+    for sec_pts, sec_diams in zip(seg_pts, seg_diams):
         j = np.array(range(len(sec_pts)-1))
         init_j = sorted([l for l in j if l+i in init_ids])
 
