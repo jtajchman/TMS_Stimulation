@@ -4,7 +4,7 @@ from pathlib import Path
 rootFolder = str(Path(os.path.abspath(__file__)).parent.parent)
 sys.path.append(rootFolder)
 
-from file_management import set_cwd, suppress_stdout
+from file_management import set_cwd, suppress_stdout, suppress_stdout_stderr
 
 from extracellular_stim_tools import runSimWithIntervalFunc, runSim, SingleExtracellular
 from netpyne import specs, sim
@@ -17,7 +17,7 @@ import io
 
 def TMS_sim(cell_name_ID: str, tms_params: dict, syn_params: dict | None = None, savestate=None, ecs_spike_recording=True, clear_ecs_data=True):
     # Runs a single simulation of a single cell using a fully defined set of TMS parameters
-    with suppress_stdout():
+    with suppress_stdout_stderr():
         setup(cell_name_ID, tms_params, syn_params, savestate=savestate)
 
         ecs = SingleExtracellular(

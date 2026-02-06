@@ -3,7 +3,7 @@ from math import ceil, sin, radians
 
 def get_angles(polar_resolution, azimuthal_resolution):
     num_polar_angles = ceil(180/polar_resolution)+1
-    polar_angles = np.linspace(0, 180, num_polar_angles)
+    polar_angles = np.linspace(0, 180, num_polar_angles).tolist()
     angles = []
     for polar_angle in polar_angles:
         num_azimuthal_angles = get_num_azimuthal_angles(polar_angle, azimuthal_resolution)

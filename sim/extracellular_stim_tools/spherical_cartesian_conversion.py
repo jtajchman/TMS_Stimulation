@@ -74,10 +74,9 @@ def norm_spherical_to_cartesian(theta, phi):
     :param theta: The polar angle.
     :return: The x, y, z coordinates.
     """
-    theta = math.radians(theta)
-    phi = math.radians(phi)
-    return (
-        math.sin(theta) * math.cos(phi),
-        math.sin(theta) * math.sin(phi),
-        math.cos(theta),
-    )
+    theta = np.radians(theta)
+    phi = np.radians(phi)
+    return np.stack((np.sin(theta) * np.cos(phi),
+                     np.sin(theta) * np.sin(phi),
+                     np.cos(theta)),
+                     axis=-1)

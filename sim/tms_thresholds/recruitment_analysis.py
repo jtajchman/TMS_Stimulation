@@ -9,6 +9,7 @@ from file_management import set_cwd_to_root_for_func
 import json
 from scipy.stats import beta
 import numpy as np
+import bisect
 
 def get_results(results_fname):
     with set_cwd_to_root_for_func(open, results_fname, 'r') as f:
@@ -142,7 +143,7 @@ def calc_polars_and_nsamples(aggregated_thresholds):
 
 
 def calc_probs(aggregated_thresholds, ef_amp):
-    return [sum(ef_amp >= np.array(thresholds))/len(thresholds) for thresholds in aggregated_thresholds.values()]
+    return [np.mean(ef_amp >= np.array(thresholds)) for thresholds in aggregated_thresholds.values()]
 
 
 def calc_pop_distribution_weights(polars, nums_samples):
@@ -177,3 +178,48 @@ def get_cell_type_recruitment_from_thresholds(thresholds_dict, ef_amp, morphs):
     probs = calc_probs(aggregated_thresholds, ef_amp)
     # Calculate recruitment
     return calc_recruitment(probs, distribution_weights)
+
+
+# Returns a function that calculates recruitment for a given ef_amp
+# Uses a known set of polar angles
+def get_recruitment_func_with_known_polars(thresholds_dict, morphs, known_polars):
+    # Aggregate thresholds
+    aggregated_thresholds = aggregate_thresholds(thresholds_dict, morphs)
+    # Polar angles available in the threshold map
+    map_polars = aggregated_thresholds.keys()
+    # Dist weights for the known polar angles
+    distribution_weights = polar_weights(map_polars, known_polars)
+
+    def recruitment_func(ef_amp):
+        # Calculate probabilities for each polar angle
+        probs = calc_probs(aggregated_thresholds, ef_amp)
+        # Calculate recruitment
+        return calc_recruitment(probs, distribution_weights)
+
+    return recruitment_func
+
+
+def polar_weights(ref_polars, target_polars):
+    weights = np.zeros_like(ref_polars)
+    for target_polar in target_polars:
+        w = interpolation_weights(ref_polars, target_polar)
+        for i, weight in w.items():
+            weights[i] += weight
+    return weights
+
+
+def interpolation_weights(x, q):
+    if not (x[0] <= q <= x[-1]):
+        raise ValueError("q is outside the interpolation range")
+
+    i = bisect.bisect_right(x, q) - 1
+
+    if i == len(x) - 1:
+        return {i: 1.0}
+
+    x0, x1 = x[i], x[i + 1]
+
+    w1 = float((q - x0) / (x1 - x0))
+    w0 = 1.0 - w1
+
+    return {i: w0, i + 1: w1}
